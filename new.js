@@ -3,25 +3,25 @@ var path = require('path');
 
 module.exports = function _new(noun, name, directory) {
   return new Promise(function promise(resolve, reject) {
-    checkForFilepathReqs(directory).then(function resolve() {
+    checkForFilepathReqs(directory).then(function () {
       if (/^passage(-tsx?)?$/.test(noun)) {
-        makeNewTsPassage(directory, name).then(function resolve() {
-          console.log('Passage ')
-        }, function reject(err) {
-          throw err;
+        makeNewTsPassage(directory, name).then(function () {
+          console.log('TypeScript passage, ' + name + ', created.');
+        }, function (err) {
+          return reject(err);
         });
       } else if (/^passage-jsx?$/.test(noun)) {
-        makeNewJsPassage(directory, name).then(function resolve() {
-    
-        }, function reject(err) {
-          throw err;
+        makeNewJsPassage(directory, name).then(function () {
+          console.log('JavaScript passage, ' + name + ', created.');
+        }, function (err) {
+          return reject(err);
         });
       } else {
         throw new Error('The subcommand ' + noun + ' was not recognized by ' +
                         'the accelerator-tool new command.');
       }
-    }, function reject(err) {
-      throw err;
+    }, function (err) {
+      return reject(err);
     });
   });
 };
@@ -31,22 +31,24 @@ function checkForFilepathReqs(directory) {
 
   return new Promise(function promise(resolve, reject) {
     fs.exists(directory, function cb(exists) {
-      if (exists) {
-        reject(new Error('There was already a directory at ' + directory + '.'));
+      if (!exists) {
+        return reject(new Error('There was no directory at ' + directory + '.'));
       }
   
       fs.exists(path.join(directory, 'passages'), function cb(exists) {
         if (!exists) {
-          reject(new Error('There was no passages directory within ' +
+          return reject(new Error('There was no passages directory within ' +
                             directory + '.'));
         }
+
+        resolve();
       });
     });
   });
 }
 
 function makeNewTsPassage(directory, name) {
-  console.log('Creating new TypeScript passage, ' + name + ' in' + directory +
+  console.log('Creating new TypeScript passage, ' + name + ' in ' + directory +
               '.');
 
   var passagesDir = path.join(directory, 'passages');
@@ -55,12 +57,17 @@ function makeNewTsPassage(directory, name) {
   return new Promise(function promise(resolve, reject) {
     fs.mkdir(newPassageDir, function cb(err) {
       if (err) {
-        reject(err);
+        if (err.code === 'EEXIST') {
+          return reject(new Error('There is already a passages/' + name + ' ' +
+                                  'directory.'));
+        }
+
+        return reject(err);
       }
 
       fs.readFile(templatePath, function cb(err, data) {
         if (err) {
-          reject(err);
+          return reject(err);
         }
 
         var rewrittenData = makeGenericPassageReplacements({
@@ -68,9 +75,9 @@ function makeNewTsPassage(directory, name) {
           name,
         });
 
-        fs.writeFile(path.join(passagesDir, name), rewrittenData, function cb(err) {
+        fs.writeFile(path.join(newPassageDir, name + '.tsx'), rewrittenData, function cb(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
           resolve();
@@ -90,12 +97,12 @@ function makeNewJsPassage(directory) {
   return new Promise(function promise(resolve, reject) {
     fs.mkdir(newPassageDir, function cb(err) {
       if (err) {
-        reject(err);
+        return reject(err);
       }
 
       fs.readFile(templatePath, function cb(err, data) {
         if (err) {
-          reject(err);
+          return reject(err);
         }
 
         var rewrittenData = makeGenericPassageReplacements({
@@ -103,9 +110,9 @@ function makeNewJsPassage(directory) {
           name,
         });
 
-        fs.writeFile(path.join(passagesDir, name), rewrittenData, function cb(err) {
+        fs.writeFile(path.join(newPassageDir, name + '.jsx'), rewrittenData, function cb(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
           resolve();

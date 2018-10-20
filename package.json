@@ -1,6 +1,6 @@
 {
   "name": "accelerator-tool",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new passages within them.",
   "main": "index.js",
   "bin": "index.js",

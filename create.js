@@ -5,33 +5,40 @@ var rimraf = require('rimraf');
 var copy = require('recursive-copy');
 
 module.exports = function create(name, directory) {
-  console.log('Creating story ' + name + ' at ' + directory + '.');
+  console.log('Creating story "' + name + '" at ' + directory);
 
-  fs.mkdir(directory, function error(err) {
-    if (err && err.code !== 'EEXIST') {
-      throw new Error(err);
-    }
-
-    writeTempPackageJson(directory).then(function resolve() {
-      installCore(directory).then(function resolve() {
-        moveCore(directory).then(function resolve() {
-          removeOldCore(directory).then(function resolve() {
-            modifyCoreForRedistribution(directory).then(function resolve() {
-              console.log('Finished creating story ' + name + '.');
-            }, function reject(err) {
-              throw err;
+  return new Promise(function promise(resolve, reject) {
+    var newDir = path.join(directory, name); 
+    fs.mkdir(newDir, function error(err) {
+      if (err) {
+        if (err.code === 'EEXIST') {
+          return reject(new Error('The directory, ' + newDir + ', already exists.'));
+        } else {
+          return reject(err);
+        }
+      }
+  
+      writeTempPackageJson(newDir).then(function () {
+        installCore(newDir).then(function () {
+          moveCore(newDir).then(function () {
+            removeOldCore(newDir).then(function () {
+              modifyCoreForRedistribution(newDir).then(function () {
+                console.log('Finished creating story ' + name + '.');
+              }, function (err) {
+                return reject(err);
+              });
+            }, function (err) {
+              return reject(err);
             });
-          }, function reject(err) {
-            throw err;
+          }, function (err) {
+            return reject(err);
           });
-        }, function reject(err) {
-          throw err;
+        }, function (err) {
+          return reject(err);
         });
-      }, function reject(err) {
-        throw err;
+      }, function (err) {
+        return reject(err);
       });
-    }, function reject(err) {
-      throw err;
     });
   });
 };
@@ -48,7 +55,7 @@ function writeTempPackageJson(directory) {
   return new Promise(function promise(resolve, reject) {
     fs.writeFile(path.join(directory, 'package.json'), tempPackageJson, null, function error(err) {
       if (err && err.code !== 'EEXIST') {
-        reject(err);
+        return reject(err);
       }
   
       resolve(err);
@@ -81,7 +88,7 @@ function installCore(directory) {
   return new Promise(function promise(resolve, reject) {
     child.on('exit', function (code) {
       if (code) {
-        reject('Installation exited with code ' + code + '.');
+        return reject('Installation exited with code ' + code + '.');
       }
 
       resolve();
@@ -92,22 +99,19 @@ function installCore(directory) {
 function moveCore(directory) {
   console.log('Moving core contents to story folder.');
 
-  var coreDir = path.join(directory, 'node_modules', 'accelerator_core');
+  var coreDir = path.join(directory, 'node_modules', 'accelerator-core');
   return new Promise(function promise(resolve, reject) {
-    copy(path.join(coreDir, '*'), directory, function cb(err) {
+    var copyArgs = {
+      dot: true,
+      overwrite: true,
+    };
+
+    copy(coreDir, directory, copyArgs, function cb(err) {
       if (err) {
-        reject(err);
+        return reject(err);
       }
 
-      rimraf(coreDir, null, function cb(err) {
-        console.log('Removing core contents from node_modules.');
-
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      });
+      resolve();
     });
   });
 }
@@ -119,7 +123,7 @@ function removeOldCore(directory) {
   return new Promise(function promise(resolve, reject) {
     rimraf(coreDir, function (err) {
       if (err) {
-        reject(err);
+        return reject(err);
       }
 
       resolve();
@@ -133,8 +137,8 @@ function modifyCoreForRedistribution(directory) {
   var packagePath = path.join(directory, 'package.json');
 
   return new Promise(function promise(resolve, reject) {
-    rewritePackageJson(directory).then(function resolve() {
-      rewriteGitignore(directory).then(function resolve() {
+    rewritePackageJson(directory).then(function () {
+      writeGitignore(directory).then(function () {
         console.log('Finished modifying core.');
       }, function reject(err) {
         throw err;
@@ -148,47 +152,73 @@ function modifyCoreForRedistribution(directory) {
 function rewritePackageJson(directory) {
   console.log('Rewriting package.json.');
   
+  var packagePath = path.join(directory, 'package.json');
+
   return new Promise(function promise(resolve, reject) {
-    var corePackage = require(packagePath);
-    corePackage.name = 'untitled-accelerator-story';
-    corePackage.description = 'An untitled story built with Accelerator ' +
-                              '(accelerator-core, accelerator-tool).'
-    corePackage.version = '1.0.0';
-    fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2), function (err) {
+    fs.readFile(packagePath, function (err, data) {
       if (err) {
-        reject(err);
+        return reject(err);
       }
-      
-      resolve();
+
+      var corePackage;
+      try {
+        corePackage = JSON.parse(data.toString());
+      } catch (err) {
+        return reject(new Error('There was an error parsing the ' +
+                                'package.json file:',
+                                err));
+      }
+
+      corePackage.name = 'untitled-accelerator-story';
+      corePackage.description = 'An untitled story built with Accelerator ' +
+                                '(accelerator-core, accelerator-tool).'
+      corePackage.version = '1.0.0';
+      fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2), function (err) {
+        if (err) {
+          return reject(err);
+        }
+        
+        resolve();
+      });
     });
   });
 }
 
-function rewriteGitignore(directory) {
+function writeGitignore(directory) {
   console.log('Rewriting .gitignore.');
 
   var gitignorePath = path.join(directory, '.gitignore');
 
+  var gitignore =
+    '# See https://help.github.com/ignore-files/ for more about ignoring files.\n' +
+    '\n' +
+    '# dependencies\n' +
+    '/node_modules/\n' +
+    '\n' +
+    '# testing\n' +
+    '/coverage/\n' +
+    '\n' +
+    '# production\n' +
+    '/build*/\n' +
+    '\n' +
+    '# misc\n' +
+    '.DS_Store\n' +
+    '.env.local\n' +
+    '.env.development.local\n' +
+    '.env.test.local\n' +
+    '.env.production.local\n' +
+    '\n' +
+    'npm-debug.log*\n' +
+    'yarn-debug.log*\n' +
+    'yarn-error.log*\n';
+
   return new Promise(function promise(resolve, reject) {
-    fs.readFile(gitignorePath, function cb(err, data) {
+    fs.writeFile(gitignorePath, gitignore, function cb(err) {
       if (err) {
-        reject(err);
+        return reject(err);
       }
 
-      var gitignorePattern = 
-        '# passages\n' +
-        '/passages/*\n' +
-        '!/passages/.gitkeep\n' +
-        '# endpassages\n';
-      var dataStr = data.toString().replace(gitignorePattern, '');
-
-      writeFile(gitignorePath, dataStr, function cb(err) {
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      });
+      resolve();
     });
   });
 }
