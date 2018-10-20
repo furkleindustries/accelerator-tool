@@ -1,0 +1,31 @@
+{
+  "name": "accelerator-tool",
+  "version": "0.1.0",
+  "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new passages within them.",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/furkleindustries/accelerator-tool.git"
+  },
+  "keywords": [
+    "accelerator",
+    "if",
+    "hypertext",
+    "fiction"
+  ],
+  "author": "furkle",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/furkleindustries/accelerator-tool/issues"
+  },
+  "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "recursive-copy": "^2.0.9",
+    "rimraf": "^2.6.2"
+  }
+}
