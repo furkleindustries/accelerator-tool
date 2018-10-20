@@ -15,9 +15,17 @@ module.exports = function create(name, directory) {
     writeTempPackageJson(directory).then(function resolve() {
       installCore(directory).then(function resolve() {
         moveCore(directory).then(function resolve() {
-
-        }, function reject() {
-
+          removeOldCore(directory).then(function resolve() {
+            modifyCoreForRedistribution(directory).then(function resolve() {
+              console.log('Finished creating story ' + name + '.');
+            }, function reject(err) {
+              throw err;
+            });
+          }, function reject(err) {
+            throw err;
+          });
+        }, function reject(err) {
+          throw err;
         });
       }, function reject(err) {
         throw err;
@@ -26,7 +34,7 @@ module.exports = function create(name, directory) {
       throw err;
     });
   });
-}
+};
 
 function writeTempPackageJson(directory) {
   console.log('Writing temporary package.json.');
@@ -84,9 +92,9 @@ function installCore(directory) {
 function moveCore(directory) {
   console.log('Moving core contents to story folder.');
 
-  var coreDir = join(directory, 'node_modules', 'accelerator_core');
+  var coreDir = path.join(directory, 'node_modules', 'accelerator_core');
   return new Promise(function promise(resolve, reject) {
-    copy(join(coreDir, '*'), directory, function cb(err) {
+    copy(path.join(coreDir, '*'), directory, function cb(err) {
       if (err) {
         reject(err);
       }
@@ -94,6 +102,87 @@ function moveCore(directory) {
       rimraf(coreDir, null, function cb(err) {
         console.log('Removing core contents from node_modules.');
 
+        if (err) {
+          reject(err);
+        }
+
+        resolve();
+      });
+    });
+  });
+}
+
+function removeOldCore(directory) {
+  console.log('Removing old core directory.');
+
+  var coreDir = path.join(directory, 'node_modules', 'accelerator_core');
+  return new Promise(function promise(resolve, reject) {
+    rimraf(coreDir, function (err) {
+      if (err) {
+        reject(err);
+      }
+
+      resolve();
+    });
+  });
+}
+
+function modifyCoreForRedistribution(directory) {
+  console.log('Modifying core for redistribution.');
+
+  var packagePath = path.join(directory, 'package.json');
+
+  return new Promise(function promise(resolve, reject) {
+    rewritePackageJson(directory).then(function resolve() {
+      rewriteGitignore(directory).then(function resolve() {
+        console.log('Finished modifying core.');
+      }, function reject(err) {
+        throw err;
+      });
+    }, function reject(err) {
+      throw err;
+    });
+  });
+}
+
+function rewritePackageJson(directory) {
+  console.log('Rewriting package.json.');
+  
+  return new Promise(function promise(resolve, reject) {
+    var corePackage = require(packagePath);
+    corePackage.name = 'untitled-accelerator-story';
+    corePackage.description = 'An untitled story built with Accelerator ' +
+                              '(accelerator-core, accelerator-tool).'
+    corePackage.version = '1.0.0';
+    fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2), function (err) {
+      if (err) {
+        reject(err);
+      }
+      
+      resolve();
+    });
+  });
+}
+
+function rewriteGitignore(directory) {
+  console.log('Rewriting .gitignore.');
+
+  var gitignorePath = path.join(directory, '.gitignore');
+
+  return new Promise(function promise(resolve, reject) {
+    fs.readFile(gitignorePath, function cb(err, data) {
+      if (err) {
+        reject(err);
+      }
+
+      var gitignorePattern = 
+        '# passages\n' +
+        '/passages/*\n' +
+        '!/passages/.gitkeep\n' +
+        '# endpassages\n';
+      var dataStr = data.toString().replace(gitignorePattern, '');
+
+      writeFile(gitignorePath, dataStr, function cb(err) {
         if (err) {
           reject(err);
         }
