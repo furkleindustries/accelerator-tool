@@ -8,7 +8,7 @@ module.exports = function create(name, directory) {
   console.log('Creating story "' + name + '" at ' + directory);
 
   return new Promise(function promise(resolve, reject) {
-    var newDir = path.join(directory, name); 
+    var newDir = directory; 
     fs.mkdir(newDir, function error(err) {
       if (err) {
         if (err.code === 'EEXIST') {
@@ -175,8 +175,8 @@ function rewritePackageJson(directory) {
       corePackage.version = '1.0.0';
 
       var keys = Object.keys(corePackage);
-      for (var ii; ii < keys.length; ii += 1) {
-        if (keys[0] === '_') {
+      for (var ii = 0; ii < keys.length; ii += 1) {
+        if (keys[ii][0] === '_') {
           delete corePackage[keys[ii]];
         }
       }

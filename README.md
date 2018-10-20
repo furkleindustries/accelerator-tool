@@ -25,4 +25,4 @@ For the second, you can create either TypeScript passages or JavaScript passages
 * `accelerator-tool new passage MyNewPassage [optional story directory]`
 * `accelerator-tool new passage-js MyNewPassage [optional story directory]`
 
-If you do not provide the story directory as a positional argument, you must be in a the directory of an Accelerator story, with a `passages` subdirectory.
+If you do not provide the story directory as a positional argument, you must be in the root directory of an Accelerator story, containing a `passages` subdirectory.
