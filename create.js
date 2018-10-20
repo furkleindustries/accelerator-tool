@@ -37,12 +37,14 @@ function writeTempPackageJson(directory) {
     description: 'If you can see this, something went wrong.',
   });
 
-  fs.writeFile(path.join(directory, 'package.json'), tempPackageJson, null, function error(err) {
-    if (err && err.code !== 'EEXIST') {
-      reject(err);
-    }
-
-    resolve(err);
+  return new Promise(function promise(resolve, reject) {
+    fs.writeFile(path.join(directory, 'package.json'), tempPackageJson, null, function error(err) {
+      if (err && err.code !== 'EEXIST') {
+        reject(err);
+      }
+  
+      resolve(err);
+    });
   });
 }
 
@@ -90,6 +92,8 @@ function moveCore(directory) {
       }
 
       rimraf(coreDir, null, function cb(err) {
+        console.log('Removing core contents from node_modules.');
+
         if (err) {
           reject(err);
         }
