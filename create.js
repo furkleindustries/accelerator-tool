@@ -18,7 +18,7 @@ module.exports = function create(name, directory) {
 
         }, function reject() {
 
-        })
+        });
       }, function reject(err) {
         throw err;
       });
@@ -80,6 +80,8 @@ function installCore(directory) {
 }
 
 function moveCore(directory) {
+  console.log('Moving core contents to story folder.');
+
   var coreDir = join(directory, 'node_modules', 'accelerator_core');
   return new Promise(function promise(resolve, reject) {
     copy(join(coreDir, '*'), directory, function cb(err) {
