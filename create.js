@@ -173,6 +173,14 @@ function rewritePackageJson(directory) {
       corePackage.description = 'An untitled story built with Accelerator ' +
                                 '(accelerator-core, accelerator-tool).'
       corePackage.version = '1.0.0';
+
+      var keys = Object.keys(corePackage);
+      for (var ii; ii < keys.length; ii += 1) {
+        if (keys[0] === '_') {
+          delete corePackage[keys[ii]];
+        }
+      }
+
       fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2), function (err) {
         if (err) {
           return reject(err);
