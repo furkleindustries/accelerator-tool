@@ -23,7 +23,11 @@ module.exports = function create(name, directory) {
           moveCore(newDir).then(function () {
             removeOldCore(newDir).then(function () {
               modifyCoreForRedistribution(newDir).then(function () {
-                console.log('Finished creating story ' + name + '.');
+                installProject(directory).then(function () {
+                  console.log('Finished creating story ' + name + '.');
+                }, function (err) {
+                  return reject(err);  
+                });
               }, function (err) {
                 return reject(err);
               });
@@ -88,12 +92,12 @@ function installCore(directory) {
   return new Promise(function promise(resolve, reject) {
     child.on('exit', function (code) {
       if (code) {
-        return reject('Installation exited with code ' + code + '.');
+        return reject('Core installation exited with code ' + code + '.');
       }
 
       resolve();
     });
-  })
+  });
 }
 
 function moveCore(directory) {
@@ -176,7 +180,7 @@ function rewritePackageJson(directory) {
 
       var keys = Object.keys(corePackage);
       for (var ii = 0; ii < keys.length; ii += 1) {
-        if (keys[ii][0] === '_') {
+        if (keys[ii] === 'bundleDependencies' || keys[ii][0] === '_') {
           delete corePackage[keys[ii]];
         }
       }
@@ -224,6 +228,36 @@ function writeGitignore(directory) {
     fs.writeFile(gitignorePath, gitignore, function cb(err) {
       if (err) {
         return reject(err);
+      }
+
+      resolve();
+    });
+  });
+}
+
+function installProject(directory) {
+  console.log('Installing project dependencies.');
+
+  var cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  var args = [ 'install', ];
+
+  var spawnArgs = {
+    cwd: directory,
+  };
+
+  var child = childProcess.spawn(cmd, args, spawnArgs);
+  child.stdout.on('data', function (data) {
+    console.log(data.toString());
+  });
+
+  child.stderr.on('data', function (data) {
+    console.log(data.toString());
+  });
+
+  return new Promise(function promise(resolve, reject) {
+    child.on('exit', function (code) {
+      if (code) {
+        return reject('Project installation exited with code ' + code + '.');
       }
 
       resolve();
