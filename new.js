@@ -4,22 +4,21 @@ var path = require('path');
 module.exports = function _new(noun, name, directory) {
   return new Promise(function promise(resolve, reject) {
     checkForFilepathReqs(directory).then(function () {
+      var passageArgs = [ null, directory, name, ];
       if (/^passage(-tsx?)?$/.test(noun)) {
-        makeNewTsPassage(directory, name).then(function () {
-          console.log('TypeScript passage, ' + name + ', created.');
-        }, function (err) {
-          return reject(err);
-        });
+        passageArgs[0] = 'ts';
       } else if (/^passage-jsx?$/.test(noun)) {
-        makeNewJsPassage(directory, name).then(function () {
-          console.log('JavaScript passage, ' + name + ', created.');
-        }, function (err) {
-          return reject(err);
-        });
+        passageArgs[0] = 'js';
       } else {
         throw new Error('The subcommand ' + noun + ' was not recognized by ' +
                         'the accelerator-tool new command.');
       }
+
+      makeNewPassage.apply(null, passageArgs).then(function () {
+        console.log('TypeScript passage, ' + name + ', created.');
+      }, function (err) {
+        return reject(err);
+      });
     }, function (err) {
       return reject(err);
     });
@@ -47,81 +46,110 @@ function checkForFilepathReqs(directory) {
   });
 }
 
-function makeNewTsPassage(directory, name) {
-  console.log('Creating new TypeScript passage, ' + name + ' in ' + directory +
-              '.');
-
-  var passagesDir = path.join(directory, 'passages');
-  var templatePath = path.join(directory, 'templates', 'passage.tsx');
-  var newPassageDir = path.join(passagesDir, name);
-  return new Promise(function promise(resolve, reject) {
-    fs.mkdir(newPassageDir, function cb(err) {
-      if (err) {
-        if (err.code === 'EEXIST') {
-          return reject(new Error('There is already a passages/' + name + ' ' +
-                                  'directory.'));
-        }
-
-        return reject(err);
-      }
-
-      fs.readFile(templatePath, function cb(err, data) {
-        if (err) {
-          return reject(err);
-        }
-
-        var rewrittenData = makeGenericPassageReplacements({
-          data,
-          name,
-        });
-
-        fs.writeFile(path.join(newPassageDir, name + '.tsx'), rewrittenData, function cb(err) {
-          if (err) {
-            return reject(err);
-          }
-
-          resolve();
-        });
-      });
-    })
-  });
-}
-
-function makeNewJsPassage(directory) {
+function makeNewPassage(type, directory, name) {
   console.log('Creating new TypeScript passage, ' + name + ' in' + directory +
               '.');
 
+  if (!/^[jt]s$/.test(type)) {
+    throw new Error('The type received by makeNewPassage was neither "ts" ' +
+                    'nor "js".');
+  }
+
+  var codeExtension = type === 'js' ? '.jsx' : '.tsx'
   var passagesDir = path.join(directory, 'passages');
-  var templatePath = path.join(directory, 'templates', 'passage.tsx');
+  var templatesDir = path.join(directory, 'templates');
+  var codeTemplatePath = path.join(templatesDir, 'passage' + codeExtension);
+  var testTemplatePath = path.join(templatesDir, 'passage.test' + codeExtension);
+  var styleTemplatePath = path.join(templatesDir, 'passage.scss');
   var newPassageDir = path.join(passagesDir, name);
   return new Promise(function promise(resolve, reject) {
+    console.log('Creating new passage directory at ' + newPassageDir);
+    
     fs.mkdir(newPassageDir, function cb(err) {
       if (err) {
         return reject(err);
       }
 
-      fs.readFile(templatePath, function cb(err, data) {
+      console.log('Reading code template at ' + codeTemplatePath);
+
+      fs.readFile(codeTemplatePath, function cb(err, data) {
         if (err) {
           return reject(err);
         }
 
-        var rewrittenData = makeGenericPassageReplacements({
+        console.log('Rewriting code template.');
+
+        var rewrittenData = makeGenericTemplateReplacements({
           data,
           name,
         });
 
-        fs.writeFile(path.join(newPassageDir, name + '.jsx'), rewrittenData, function cb(err) {
+        var newCodePath = path.join(newPassageDir, name + codeExtension);
+
+        console.log('Writing code template to ' + newCodePath);
+
+        fs.writeFile(newCodePath, rewrittenData, function cb(err) {
           if (err) {
             return reject(err);
           }
 
-          resolve();
+          console.log('Reading test template from ' + testTemplatePath);
+
+          fs.readFile(testTemplatePath, function cb(err, data) {
+            if (err) {
+              return reject(err);
+            }
+
+            console.log('Rewriting test template.');
+
+            var rewrittenData = makeGenericTemplateReplacements({
+              data,
+              name,
+            });
+
+            var newTestPath = path.join(newPassageDir, name + '.test' + codeExtension);
+
+            console.log('Writing test template to ' + newTestPath);
+
+            fs.writeFile(newTestPath, rewrittenData, function cb(err) {
+              if (err) {
+                return reject(err);
+              }
+
+              console.log('Reading style template from ' + styleTemplatePath);
+
+              fs.readFile(styleTemplatePath, function cb(err, data) {
+                if (err) {
+                  return reject(err);
+                }
+
+                console.log('Rewriting style template.');
+
+                var rewrittenData = makeGenericTemplateReplacements({
+                  data,
+                  name,
+                });
+
+                var newStylePath = path.join(newPassageDir, name + '.scss');
+
+                console.log('Writing style template to ' + newStylePath);
+
+                fs.writeFile(newStylePath, rewrittenData, function cb(err) {
+                  if (err) {
+                    return reject(err);
+                  }
+
+                  resolve();
+                });
+              });
+            });
+          });
         });
       });
     })
   });
 }
 
-function makeGenericPassageReplacements(args) {
+function makeGenericTemplateReplacements(args) {
   return args.data.toString().replace('%NAME%', args.name);
 }

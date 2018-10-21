@@ -1,6 +1,6 @@
 # accelerator-tool
 
-The devtool for the Accelerator story framework, allowing quick creation of new projects, and new passages within them.
+The devtool for the [Accelerator story framework](https://github.com/furkleindustries/accelerator-core), allowing quick creation of new projects, and new passages within them.
 
 ## Installation
 
