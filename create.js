@@ -23,7 +23,7 @@ module.exports = function create(name, directory) {
           moveCore(newDir).then(function () {
             removeOldCore(newDir).then(function () {
               modifyCoreForRedistribution(newDir).then(function () {
-                installProject(directory).then(function () {
+                installProject(newDir).then(function () {
                   console.log('Finished creating story ' + name + '.');
                 }, function (err) {
                   return reject(err);  
@@ -144,11 +144,13 @@ function modifyCoreForRedistribution(directory) {
     rewritePackageJson(directory).then(function () {
       writeGitignore(directory).then(function () {
         console.log('Finished modifying core.');
-      }, function reject(err) {
-        throw err;
+        
+        resolve();
+      }, function (err) {
+        return reject(err);
       });
-    }, function reject(err) {
-      throw err;
+    }, function (err) {
+      return reject(err);
     });
   });
 }

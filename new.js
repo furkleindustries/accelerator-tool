@@ -64,7 +64,7 @@ function makeNewPassage(type, directory, name) {
   var newPassageDir = path.join(passagesDir, name);
   return new Promise(function promise(resolve, reject) {
     console.log('Creating new passage directory at ' + newPassageDir);
-    
+
     fs.mkdir(newPassageDir, function cb(err) {
       if (err) {
         return reject(err);
