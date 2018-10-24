@@ -138,8 +138,6 @@ function removeOldCore(directory) {
 function modifyCoreForRedistribution(directory) {
   console.log('Modifying core for redistribution.');
 
-  var packagePath = path.join(directory, 'package.json');
-
   return new Promise(function promise(resolve, reject) {
     rewritePackageJson(directory).then(function () {
       writeGitignore(directory).then(function () {
@@ -179,6 +177,16 @@ function rewritePackageJson(directory) {
       corePackage.description = 'An untitled story built with Accelerator ' +
                                 '(accelerator-core, accelerator-tool).'
       corePackage.version = '1.0.0';
+
+      /* Rewrite jest configuration so that the redistribution tests packages,
+       * even though the core repo/package does not. */
+      corePackage.jest.testMatch = corePackage.jest.testMatch.map(function (match) {
+        if (match.indexOf('%PASSAGES_REDIST_REWRITE%') !== -1) {
+          return match.replace('%PASSAGES_REDIST_REWRITE%', 'passages');
+        }
+
+        return match;
+      });
 
       var keys = Object.keys(corePackage);
       for (var ii = 0; ii < keys.length; ii += 1) {
