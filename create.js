@@ -178,15 +178,12 @@ function rewritePackageJson(directory) {
                                 '(accelerator-core, accelerator-tool).'
       corePackage.version = '1.0.0';
 
-      /* Rewrite jest configuration so that the redistribution tests packages,
-       * even though the core repo/package does not. */
-      corePackage.jest.testMatch = corePackage.jest.testMatch.map(function (match) {
-        if (match.indexOf('%PASSAGES_REDIST_REWRITE%') !== -1) {
-          return match.replace('%PASSAGES_REDIST_REWRITE%', 'passages');
-        }
-
-        return match;
-      });
+      /* Rewrite jest configuration so that the redist tests packages, even
+       * though the core repo/package does not, and the redist does not test
+       * src/, even though the repo/package does. */
+      corePackage.jest.testMatch = [
+        "<rootDir>/passages/**/?(*.)(spec|test).(j|t)s?(x)",
+      ]
 
       var keys = Object.keys(corePackage);
       for (var ii = 0; ii < keys.length; ii += 1) {
