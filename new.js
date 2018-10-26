@@ -16,6 +16,7 @@ module.exports = function _new(noun, name, directory) {
 
       makeNewPassage.apply(null, passageArgs).then(function () {
         console.log('TypeScript passage, ' + name + ', created.');
+        resolve();
       }, function (err) {
         return reject(err);
       });
