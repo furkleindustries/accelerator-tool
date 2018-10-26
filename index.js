@@ -45,7 +45,7 @@ program
       for (var ii = 0; ii < newNouns.length; ii += 1) {
         if (noun === newNouns[ii]) {
           found = true;
-          require('./new')(newNouns[ii], name, realDir);
+          require('./new')(noun, name, realDir);
           break;
         }
       }
