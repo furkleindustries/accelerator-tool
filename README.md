@@ -1,6 +1,8 @@
+![Accelerator speedometer logo](https://s3.amazonaws.com/furkleindustries-accelerator/logo_320px.png "Accelerator speedometer logo")
+
 # accelerator-tool
 
-The devtool for the [Accelerator story framework](https://github.com/furkleindustries/accelerator-core), allowing quick creation of new projects, and new passages within them.
+The devtool for the Accelerator story framework ([git repository](https://github.com/furkleindustries/accelerator-core), [npm package](https://npmjs.com/package/accelerator-core)), allowing quick creation of new projects, and new passages within them.
 
 ## Installation
 

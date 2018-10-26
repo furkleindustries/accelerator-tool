@@ -17,7 +17,7 @@ module.exports = function create(name, directory) {
           return reject(err);
         }
       }
-  
+
       writeTempPackageJson(newDir).then(function () {
         installCore(newDir).then(function () {
           moveCore(newDir).then(function () {
@@ -25,6 +25,7 @@ module.exports = function create(name, directory) {
               modifyCoreForRedistribution(newDir).then(function () {
                 installProject(newDir).then(function () {
                   console.log('Finished creating story ' + name + '.');
+                  resolve();
                 }, function (err) {
                   return reject(err);  
                 });
