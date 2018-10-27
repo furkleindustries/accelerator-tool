@@ -22,7 +22,7 @@ module.exports = function create(name, directory) {
         installCore(newDir).then(function () {
           moveCore(newDir).then(function () {
             removeOldCore(newDir).then(function () {
-              modifyCoreForRedistribution(newDir).then(function () {
+              modifyCoreForRedistribution(newDir, name).then(function () {
                 installProject(newDir).then(function () {
                   console.log('Finished creating story ' + name + '.');
                   resolve();
@@ -136,15 +136,19 @@ function removeOldCore(directory) {
   });
 }
 
-function modifyCoreForRedistribution(directory) {
+function modifyCoreForRedistribution(directory, name) {
   console.log('Modifying core for redistribution.');
 
   return new Promise(function promise(resolve, reject) {
     rewritePackageJson(directory).then(function () {
       writeGitignore(directory).then(function () {
-        console.log('Finished modifying core.');
-        
-        resolve();
+        renameCodeWorkspace(directory, name).then(function () {
+          console.log('Finished modifying core.');
+
+          resolve();
+        }, function (err) {
+          return reject(err);
+        })
       }, function (err) {
         return reject(err);
       });
@@ -241,6 +245,22 @@ function writeGitignore(directory) {
       resolve();
     });
   });
+}
+
+function renameCodeWorkspace(directory, name) {
+  console.log('Renaming code-workspace file.');
+
+  var from = path.join(directory, 'accelerator-core.code-workspace');
+  var to = path.join(directory, name + '.code-workspace');
+  return new Promise(function promise(reject, resolve) {
+    fs.rename(from, to, function cb(err) {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve();
+    });
+  })
 }
 
 function installProject(directory) {
