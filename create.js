@@ -252,7 +252,7 @@ function renameCodeWorkspace(directory, name) {
 
   var from = path.join(directory, 'accelerator-core.code-workspace');
   var to = path.join(directory, name + '.code-workspace');
-  return new Promise(function promise(reject, resolve) {
+  return new Promise(function promise(resolve, reject) {
     fs.rename(from, to, function cb(err) {
       if (err) {
         return reject(err);
