@@ -153,5 +153,5 @@ function makeNewPassage(type, directory, name) {
 }
 
 function makeGenericTemplateReplacements(args) {
-  return args.data.toString().replace('%NAME%', args.name);
+  return args.data.toString().split('%NAME%').join(args.name);
 }
