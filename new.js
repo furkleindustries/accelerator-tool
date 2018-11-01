@@ -4,23 +4,58 @@ var path = require('path');
 module.exports = function _new(noun, name, directory) {
   return new Promise(function promise(resolve, reject) {
     checkForFilepathReqs(directory).then(function () {
-      var passageArgs = [ null, directory, name, ];
+      var newArgs = [ null, directory, name, ];
       if (/^passage(-tsx?)?$/.test(noun)) {
-        passageArgs[0] = 'ts';
+        newArgs[0] = 'passage-ts';
       } else if (/^passage-jsx?$/.test(noun)) {
-        passageArgs[0] = 'js';
+        newArgs[0] = 'passage-js';
+      } else if (/^header(-tsx?)?$/.test(noun)) {
+        newArgs[0] = 'header-ts';
+      } else if (/^header-jsx?$/.test(noun)) {
+        newArgs[0] = 'header-js';
+      } else if (/^footer(-tsx?)?$/.test(noun)) {
+        newArgs[0] = 'footer-ts';
+      } else if (/^footer-jsx?$/.test(noun)) {
+        newArgs[0] = 'footer-js';
       } else {
         throw new Error('The subcommand ' + noun + ' was not recognized by ' +
                         'the accelerator-tool new command.');
       }
 
-      makeNewPassage.apply(null, passageArgs).then(function () {
-        console.log('TypeScript passage, ' + name + ', created.');
+      if (newArgs[0] === 'passage-ts' || newArgs[0] === 'passage-js') {
+        makeNewPassage.apply(null, newArgs).then(function () {
+          console.log(
+            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            'passage, ' + name + ', created.'
+          );
 
-        resolve();
-      }, function (err) {
-        return reject(err);
-      });
+          resolve();
+        }, function (err) {
+          return reject(err);
+        });
+      } else if (newArgs[0] === 'header-ts' || newArgs[0] === 'header-js') {
+        makeNewHeader.apply(null, newArgs).then(function () {
+          console.log(
+            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            'header, ' + name + ', created.'
+          );
+  
+          resolve();
+        }, function (err) {
+          return reject(err);
+        });
+      } else if (newArgs[0] === 'footer-ts' || newArgs[0] === 'footer-js') {
+        makeNewFooter.apply(null, passageArgs).then(function () {
+          console.log(
+            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            'footer, ' + name + ', created.'
+          );
+
+          resolve();
+        }, function (err) {
+          return reject(err);
+        });
+      }
     }, function (err) {
       return reject(err);
     });
@@ -38,8 +73,11 @@ function checkForFilepathReqs(directory) {
   
       fs.exists(path.join(directory, 'passages'), function cb(exists) {
         if (!exists) {
-          return reject(new Error('There was no passages directory within ' +
-                            directory + '.'));
+          var err = new Error(
+            'There was no passages directory within ' + directory + '.'
+          );
+
+          return reject(err);
         }
 
         resolve();
@@ -49,106 +87,179 @@ function checkForFilepathReqs(directory) {
 }
 
 function makeNewPassage(type, directory, name) {
-  console.log('Creating new TypeScript passage, ' + name + ' in' + directory +
-              '.');
-
-  if (!/^[jt]s$/.test(type)) {
-    throw new Error('The type received by makeNewPassage was neither "ts" ' +
-                    'nor "js".');
+  if (!/^[jt]s-passage$/.test(type)) {
+    throw new Error('The type received by makeNewPassage was neither ' +
+                    '"ts-passage" nor "js-passage".');
   }
 
-  var codeExtension = type === 'js' ? '.jsx' : '.tsx'
-  var passagesDir = path.join(directory, 'passages');
+  var type = 'passage';
+  var codeExtension = type === 'js-passage' ? '.jsx' : '.tsx'
+  var destinationDir = path.join(directory, 'passages', name);
+  var includeStyle = true;
   var templatesDir = path.join(directory, 'templates');
-  var codeTemplatePath = path.join(templatesDir, 'passage' + codeExtension);
-  var testTemplatePath = path.join(templatesDir, 'passage.test' + codeExtension);
-  var styleTemplatePath = path.join(templatesDir, 'passage.scss');
-  var newPassageDir = path.join(passagesDir, name);
-  return new Promise(function promise(resolve, reject) {
-    console.log('Creating new passage directory at ' + newPassageDir);
 
-    fs.mkdir(newPassageDir, function cb(err) {
-      if (err) {
+  return makeNewAsset({
+    codeExtension,
+    destinationDir,
+    includeStyle,
+    name,
+    templatesDir,
+    type,
+  });
+}
+
+function makeNewHeader(type, directory, name) {
+  if (!/^[jt]s-header$/.test(type)) {
+    throw new Error('The type received by makeNewHeader was neither "ts-header" ' +
+                    'nor "js-header".');
+  }
+
+  var type = 'header';
+  var codeExtension = type === 'js-header' ? '.jsx' : '.tsx'
+  var destinationDir = path.join(directory, 'headers');
+  var includeStyle = true;
+  var templatesDir = path.join(directory, 'templates');
+
+  return makeNewAsset({
+    codeExtension,
+    destinationDir,
+    includeStyle,
+    name,
+    templatesDir,
+    type,
+  });
+}
+
+function makeNewFooter(type, directory, name) {
+  if (!/^[jt]s-footer$/.test(type)) {
+    throw new Error('The type received by makeNewFooter was neither ' +
+                    '"ts-footer" nor "js-footer".');
+  }
+  
+  var type = 'footer';
+  var codeExtension = type === 'js-footer' ? '.jsx' : '.tsx'
+  var destinationDir = path.join(directory, 'footers');
+  var includeStyle = true;
+  var templatesDir = path.join(directory, 'templates');
+
+  return makeNewAsset({
+    codeExtension,
+    destinationDir,
+    includeStyle,
+    name,
+    templatesDir,
+    type,
+  });
+}
+
+function makeNewAsset(args) {
+  var codeExtension = args.codeExtension;
+  var destinationDir = args.destinationDir;
+  var templatesDir = args.templatesDir;
+  var type = args.type;
+  var includeStyle = args.includeStyle;
+
+  var newAssetFolder = path.join(destinationDir, name);
+
+  console.log('Creating new ' + type + ' directory at ' + newAssetFolder);
+
+  var codeTemplatePath = path.join(templatesDir, type + codeExtension);
+  var testTemplatePath = path.join(templatesDir, type + '.test' + codeExtension);
+  var styleTemplatePath = path.join(templatesDir, type + '.scss');
+
+  return new Promise(function promise(resolve, reject) {
+    fs.mkdir(destinationDir, function cb(err) {
+      if (err && err.code !== 'EEXIST') {
         return reject(err);
       }
 
-      console.log('Reading code template at ' + codeTemplatePath);
-
-      fs.readFile(codeTemplatePath, function cb(err, data) {
+      fs.mkdir(newAssetFolder, function cb(err) {
         if (err) {
-          return reject(err);
+          reject(err);
         }
 
-        console.log('Rewriting code template.');
+        console.log('Reading code template at ' + codeTemplatePath);
 
-        var rewrittenData = makeGenericTemplateReplacements({
-          data,
-          name,
-        });
-
-        var newCodePath = path.join(newPassageDir, name + codeExtension);
-
-        console.log('Writing code template to ' + newCodePath);
-
-        fs.writeFile(newCodePath, rewrittenData, function cb(err) {
+        fs.readFile(codeTemplatePath, function cb(err, data) {
           if (err) {
             return reject(err);
           }
 
-          console.log('Reading test template from ' + testTemplatePath);
+          console.log('Rewriting code template.');
 
-          fs.readFile(testTemplatePath, function cb(err, data) {
+          var rewrittenData = makeGenericTemplateReplacements({
+            data,
+            name,
+          });
+
+          var newCodePath = path.join(destinationDir, name + codeExtension);
+
+          console.log('Writing code template to ' + newCodePath);
+
+          fs.writeFile(newCodePath, rewrittenData, function cb(err) {
             if (err) {
               return reject(err);
             }
 
-            console.log('Rewriting test template.');
+            console.log('Reading test template from ' + testTemplatePath);
 
-            var rewrittenData = makeGenericTemplateReplacements({
-              data,
-              name,
-            });
-
-            var newTestPath = path.join(newPassageDir, name + '.test' + codeExtension);
-
-            console.log('Writing test template to ' + newTestPath);
-
-            fs.writeFile(newTestPath, rewrittenData, function cb(err) {
+            fs.readFile(testTemplatePath, function cb(err, data) {
               if (err) {
                 return reject(err);
               }
 
-              console.log('Reading style template from ' + styleTemplatePath);
+              console.log('Rewriting test template.');
 
-              fs.readFile(styleTemplatePath, function cb(err, data) {
+              var rewrittenData = makeGenericTemplateReplacements({
+                data,
+                name,
+              });
+
+              var newTestPath = path.join(destinationDir, name + '.test' + codeExtension);
+
+              console.log('Writing test template to ' + newTestPath);
+
+              fs.writeFile(newTestPath, rewrittenData, function cb(err) {
                 if (err) {
                   return reject(err);
                 }
 
-                console.log('Rewriting style template.');
+                if (includeStyle) {
+                  console.log('Reading style template from ' + styleTemplatePath);
 
-                var rewrittenData = makeGenericTemplateReplacements({
-                  data,
-                  name,
-                });
+                  fs.readFile(styleTemplatePath, function cb(err, data) {
+                    if (err) {
+                      return reject(err);
+                    }
 
-                var newStylePath = path.join(newPassageDir, name + '.scss');
+                    console.log('Rewriting style template.');
 
-                console.log('Writing style template to ' + newStylePath);
+                    var rewrittenData = makeGenericTemplateReplacements({
+                      data,
+                      name,
+                    });
 
-                fs.writeFile(newStylePath, rewrittenData, function cb(err) {
-                  if (err) {
-                    return reject(err);
-                  }
+                    var newStylePath = path.join(destinationDir, name + '.scss');
 
+                    console.log('Writing style template to ' + newStylePath);
+
+                    fs.writeFile(newStylePath, rewrittenData, function cb(err) {
+                      if (err) {
+                        return reject(err);
+                      }
+
+                      resolve();
+                    });
+                  });
+                } else {
                   resolve();
-                });
+                }
               });
             });
           });
         });
       });
-    })
+    });
   });
 }
 
