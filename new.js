@@ -87,13 +87,13 @@ function checkForFilepathReqs(directory) {
 }
 
 function makeNewPassage(type, directory, name) {
-  if (!/^[jt]s-passage$/.test(type)) {
+  if (!/^passage-[jt]s$/.test(type)) {
     throw new Error('The type received by makeNewPassage was neither ' +
-                    '"ts-passage" nor "js-passage".');
+                    '"passage-ts" nor "passage-js".');
   }
 
   var type = 'passage';
-  var codeExtension = type === 'js-passage' ? '.jsx' : '.tsx'
+  var codeExtension = type === 'passage-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'passages', name);
   var includeStyle = true;
   var templatesDir = path.join(directory, 'templates');
@@ -109,13 +109,13 @@ function makeNewPassage(type, directory, name) {
 }
 
 function makeNewHeader(type, directory, name) {
-  if (!/^[jt]s-header$/.test(type)) {
-    throw new Error('The type received by makeNewHeader was neither "ts-header" ' +
-                    'nor "js-header".');
+  if (!/^header-[jt]s$/.test(type)) {
+    throw new Error('The type received by makeNewHeader was neither ' +
+                    '"header-ts" nor "header-js".');
   }
 
   var type = 'header';
-  var codeExtension = type === 'js-header' ? '.jsx' : '.tsx'
+  var codeExtension = type === 'header-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'headers');
   var includeStyle = true;
   var templatesDir = path.join(directory, 'templates');
@@ -131,13 +131,13 @@ function makeNewHeader(type, directory, name) {
 }
 
 function makeNewFooter(type, directory, name) {
-  if (!/^[jt]s-footer$/.test(type)) {
+  if (!/^footer-[jt]s$/.test(type)) {
     throw new Error('The type received by makeNewFooter was neither ' +
-                    '"ts-footer" nor "js-footer".');
+                    '"footer-ts" nor "footer-js".');
   }
-  
+
   var type = 'footer';
-  var codeExtension = type === 'js-footer' ? '.jsx' : '.tsx'
+  var codeExtension = type === 'footer-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'footers');
   var includeStyle = true;
   var templatesDir = path.join(directory, 'templates');
