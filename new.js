@@ -155,9 +155,10 @@ function makeNewFooter(type, directory, name) {
 function makeNewAsset(args) {
   var codeExtension = args.codeExtension;
   var destinationDir = args.destinationDir;
+  var includeStyle = args.includeStyle;
+  var name = args.name;
   var templatesDir = args.templatesDir;
   var type = args.type;
-  var includeStyle = args.includeStyle;
 
   var newAssetFolder = path.join(destinationDir, name);
 
