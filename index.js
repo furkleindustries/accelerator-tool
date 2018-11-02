@@ -2,36 +2,51 @@
 
 var fs = require('fs');
 var path = require('path');
+
 var package = require('./package.json');
-var program = require('commander');
 
 var currentDir = process.cwd();
- 
-program.version(package.version);
-  
-program
-  .command('create <name> [directory]')
-  .description('Create a new Accelerator story.')
-  .action(function action(name, directory) {
-    var realDir = directory || currentDir;
-    require('./create')(name, path.join(realDir, name));
-  });
 
-  
+var program = require('commander');
+program.version(package.version); 
+
 var newNouns = [
   'passage',
   'passage-ts',
   'passage-tsx',
   'passage-js',
   'passage-jsx',
+  'header',
+  'header-ts',
+  'header-tsx',
+  'header-js',
+  'header-jsx',
+  'footer',
+  'footer-ts',
+  'footer-tsx',
+  'footer-js',
+  'footer-jsx',
 ];
+
+program
+  .command('create <name> [directory]')
+  .description('Create a new Accelerator story.')
+  .action(function action(name, directory) {
+    if (newNouns.indexOf(name) !== -1) {
+      throw new Error('You provided a reserved word, ' + name + ', for a ' +
+                      'story name. Did you mean to use accelerator-tool new?');
+    }
+
+    var realDir = directory || currentDir;
+    require('./create')(name, path.join(realDir, name));
+  });
 
 program
   .command('new <noun> <name> [directory]')
   .description('Create a new asset in an existing Accelerator story. ' +
                'Available subcommands are ' + newNouns.join(', ') + '. ' +
                'Note that passage, passage-ts, and passage-tsx are ' +
-               'equivalent, and passage-js and passage-jsx are equivalent.')
+               'equivalent, passage-js and passage-jsx are equivalent, etc.')
   .action(function action(noun, name, directory) { 
     fs.exists(path.join(directory || currentDir, 'passages'), function ex(exists) {
       if (!exists) {
@@ -40,20 +55,7 @@ program
       }
 
       var realDir = directory || currentDir;
-
-      var found = false;
-      for (var ii = 0; ii < newNouns.length; ii += 1) {
-        if (noun === newNouns[ii]) {
-          found = true;
-          require('./new')(noun, name, realDir);
-          break;
-        }
-      }
-
-      if (!found) {
-        throw new Error('The noun used with ' + package.name + ' was not ' +
-                        'one of the following: ' + newNouns.join(', ') + '.');
-      }
+      require('./new')(noun, name, realDir);
     });
   });
 

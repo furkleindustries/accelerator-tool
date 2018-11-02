@@ -94,9 +94,9 @@ function makeNewPassage(type, directory, name) {
 
   var type = 'passage';
   var codeExtension = type === 'passage-js' ? '.jsx' : '.tsx'
-  var destinationDir = path.join(directory, 'passages', name);
+  var destinationDir = path.join(directory, 'passages');
   var includeStyle = true;
-  var templatesDir = path.join(directory, 'templates');
+  var templatesDir = path.join(directory, 'templates', type);
 
   return makeNewAsset({
     codeExtension,
@@ -118,7 +118,7 @@ function makeNewHeader(type, directory, name) {
   var codeExtension = type === 'header-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'headers');
   var includeStyle = true;
-  var templatesDir = path.join(directory, 'templates');
+  var templatesDir = path.join(directory, 'templates', type);
 
   return makeNewAsset({
     codeExtension,
@@ -140,7 +140,7 @@ function makeNewFooter(type, directory, name) {
   var codeExtension = type === 'footer-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'footers');
   var includeStyle = true;
-  var templatesDir = path.join(directory, 'templates');
+  var templatesDir = path.join(directory, 'templates', type);
 
   return makeNewAsset({
     codeExtension,
