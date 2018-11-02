@@ -32,13 +32,19 @@ program
   .command('create <name> [directory]')
   .description('Create a new Accelerator story.')
   .action(function action(name, directory) {
-    if (newNouns.indexOf(name) !== -1) {
-      throw new Error('You provided a reserved word, ' + name + ', for a ' +
-                      'story name. Did you mean to use accelerator-tool new?');
+    if (name === 'new' || newNouns.indexOf(name) !== -1) {
+      console.log('You provided a reserved word, ' + name + ', for a ' +
+                  'story name. Did you mean to use accelerator-tool new?');
+      return;
     }
 
     var realDir = directory || currentDir;
-    require('./create')(name, path.join(realDir, name));
+    try {
+      require('./create')(name, path.join(realDir, name));
+    } catch (e) {
+      console.log(e.message);
+      return;
+    }
   });
 
 program
@@ -50,12 +56,18 @@ program
   .action(function action(noun, name, directory) { 
     fs.exists(path.join(directory || currentDir, 'passages'), function ex(exists) {
       if (!exists) {
-        throw new Error('No passages folder could be found in the directory ' +
-                        'in which accelerator-tool was executed.');
+        console.log('No passages folder could be found in the directory ' +
+                    'in which accelerator-tool was executed.');
+        return;
       }
 
       var realDir = directory || currentDir;
-      require('./new')(noun, name, realDir);
+      try {
+        require('./new')(noun, name, realDir);
+      } catch (e) {
+        console.log(e.message);
+        return;
+      }
     });
   });
 

@@ -17,6 +17,10 @@ module.exports = function _new(noun, name, directory) {
         newArgs[0] = 'footer-ts';
       } else if (/^footer-jsx?$/.test(noun)) {
         newArgs[0] = 'footer-js';
+      } else if (/^plugin(-tsx?)?$/.test(noun)) {
+        newArgs[0] = 'plugin-ts';
+      } else if (/^plugin-jsx?$/.test(noun)) {
+        newArgs[0] = 'plugin-js';
       } else {
         throw new Error('The subcommand ' + noun + ' was not recognized by ' +
                         'the accelerator-tool new command.');
@@ -25,7 +29,7 @@ module.exports = function _new(noun, name, directory) {
       if (newArgs[0] === 'passage-ts' || newArgs[0] === 'passage-js') {
         makeNewPassage.apply(null, newArgs).then(function () {
           console.log(
-            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            (/js$/.test(newArgs[0]) ? 'JavaScript ' : 'TypeScript ') +
             'passage, ' + name + ', created.'
           );
 
@@ -36,7 +40,7 @@ module.exports = function _new(noun, name, directory) {
       } else if (newArgs[0] === 'header-ts' || newArgs[0] === 'header-js') {
         makeNewHeader.apply(null, newArgs).then(function () {
           console.log(
-            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            (/js$/.test(newArgs[0]) ? 'JavaScript ' : 'TypeScript ') +
             'header, ' + name + ', created.'
           );
   
@@ -45,15 +49,24 @@ module.exports = function _new(noun, name, directory) {
           return reject(err);
         });
       } else if (newArgs[0] === 'footer-ts' || newArgs[0] === 'footer-js') {
-        makeNewFooter.apply(null, passageArgs).then(function () {
+        makeNewFooter.apply(null, newArgs).then(function () {
           console.log(
-            (/js$/.test(newArgs[0]) ? 'JavaScript' : 'TypeScript ') +
+            (/js$/.test(newArgs[0]) ? 'JavaScript ' : 'TypeScript ') +
             'footer, ' + name + ', created.'
           );
 
           resolve();
         }, function (err) {
           return reject(err);
+        });
+      } else if (newArgs[0] === 'plugin-ts' || newArgs[0] === 'plugin-js') {
+        makeNewPlugin.apply(null, newArgs).then(function () {
+          console.log(
+            (/js$/.test(newArgs[0]) ? 'JavaScript ' : 'TypeScript ') +
+            'plugin, ' + name + ', created.'
+          );
+
+          resolve();
         });
       }
     }, function (err) {
@@ -140,6 +153,29 @@ function makeNewFooter(type, directory, name) {
   var codeExtension = type === 'footer-js' ? '.jsx' : '.tsx'
   var destinationDir = path.join(directory, 'footers');
   var includeStyle = true;
+  var templatesDir = path.join(directory, 'templates', type);
+
+  return makeNewAsset({
+    codeExtension,
+    destinationDir,
+    includeStyle,
+    name,
+    templatesDir,
+    type,
+  });
+}
+
+function makeNewPlugin(type, directory, name) {
+  if (!/^plugin-[jt]s$/.test(type)) {
+    throw new Error('The type received by makeNewFooter was neither ' +
+                    '"footer-ts" nor "footer-js".');
+  }
+
+  var type = 'plugin';
+  var codeExtension = type === 'plugin-js' ? '.jsx' : '.tsx'
+  var destinationDir = path.join(directory, 'plugins');
+  /* Plugins do not have any styling by default. */
+  var includeStyle = false;
   var templatesDir = path.join(directory, 'templates', type);
 
   return makeNewAsset({
