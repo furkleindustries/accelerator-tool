@@ -142,13 +142,17 @@ function modifyCoreForRedistribution(directory, name) {
   return new Promise(function promise(resolve, reject) {
     rewritePackageJson(directory).then(function () {
       writeGitignore(directory).then(function () {
-        renameCodeWorkspace(directory, name).then(function () {
-          console.log('Finished modifying core.');
-
-          resolve();
+        rewriteTslint(directory).then(function () {
+          renameCodeWorkspace(directory, name).then(function () {
+            console.log('Finished modifying core.');
+  
+            resolve();
+          }, function (err) {
+            return reject(err);
+          })
         }, function (err) {
           return reject(err);
-        })
+        }),
       }, function (err) {
         return reject(err);
       });
@@ -182,13 +186,15 @@ function rewritePackageJson(directory) {
       corePackage.description = 'An untitled story built with Accelerator ' +
                                 '(accelerator-core, accelerator-tool).'
       corePackage.version = '1.0.0';
+      corePackage.private = true;
 
-      /* Rewrite jest configuration so that the redist tests packages, even
-       * though the core repo/package does not, and the redist does not test
-       * src/, even though the repo/package does. */
+      /* Rewrite jest configuration so that the redist tests passages, headers,
+       * footers, and plugins, even though the core repo/package does not, and
+       * the redist does not test src/, even though the repo/package does. */
       corePackage.jest.testMatch = [
-        "<rootDir>/passages/**/?(*.)(spec|test).(j|t)s?(x)",
-      ]
+        '<rootDir>/(passages|headers|footers|plugins)/' +
+          '**/?(*.)(spec|test).(j|t)s?(x)',
+      ];
 
       var keys = Object.keys(corePackage);
       for (var ii = 0; ii < keys.length; ii += 1) {
@@ -243,6 +249,42 @@ function writeGitignore(directory) {
       }
 
       resolve();
+    });
+  });
+}
+
+function rewriteTslint(directory) {
+  console.log('Rewriting tslint.json.');
+  
+  var tslintConfigPath = path.join(directory, 'tslint.json');
+
+  return new Promise(function promise(resolve, reject) {
+    fs.readFile(tslintConfigPath, function (err, data) {
+      if (err) {
+        return reject(err);
+      }
+
+      var lintConfig;
+      try {
+        lintConfig = JSON.parse(data.toString());
+      } catch (err) {
+        return reject(new Error('There was an error parsing the ' +
+                                'package.json file:',
+                                err));
+      }
+
+      /* Do not lint source files in redists. */
+      lintConfig.linterOptions.exclude.push(
+        'src/'
+      );
+
+      fs.writeFile(tslintConfigPath, JSON.stringify(lintConfig, null, 2), function (err) {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
     });
   });
 }
