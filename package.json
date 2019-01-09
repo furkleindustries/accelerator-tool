@@ -25,7 +25,6 @@
   "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
   "dependencies": {
     "commander": "^2.19.0",
-    "recursive-copy": "^2.0.9",
-    "rimraf": "^2.6.2"
+    "fs-extra": "^7.0.1"
   }
 }

@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs-extra');
+const path = require('path');
 
-var package = require('./package.json');
+const package = require('./package.json');
 
-var currentDir = process.cwd();
+const currentDir = process.cwd();
 
-var program = require('commander');
+const program = require('commander');
 program.version(package.version); 
 
-var newNouns = [
+const newNouns = [
   'passage',
   'passage-ts',
   'passage-tsx',
@@ -31,18 +31,18 @@ var newNouns = [
 program
   .command('create <name> [directory]')
   .description('Create a new Accelerator story.')
-  .action(function action(name, directory) {
+  .action((name, directory) => {
     if (name === 'new' || newNouns.indexOf(name) !== -1) {
       console.log('You provided a reserved word, ' + name + ', for a ' +
                   'story name. Did you mean to use accelerator-tool new?');
       return;
     }
 
-    var realDir = directory || currentDir;
+    const realDir = directory || currentDir;
     try {
       require('./create')(name, path.join(realDir, name));
     } catch (e) {
-      console.log(e.message);
+      console.error(e.message);
       return;
     }
   });
@@ -53,19 +53,19 @@ program
                'Available subcommands are ' + newNouns.join(', ') + '. ' +
                'Note that passage, passage-ts, and passage-tsx are ' +
                'equivalent, passage-js and passage-jsx are equivalent, etc.')
-  .action(function action(noun, name, directory) { 
-    fs.exists(path.join(directory || currentDir, 'passages'), function ex(exists) {
+  .action((noun, name, directory) => { 
+    fs.exists(path.join(directory || currentDir, 'passages'), (exists) => {
       if (!exists) {
         console.log('No passages folder could be found in the directory ' +
                     'in which accelerator-tool was executed.');
         return;
       }
 
-      var realDir = directory || currentDir;
+      const realDir = directory || currentDir;
       try {
         require('./new')(noun, name, realDir);
       } catch (e) {
-        console.log(e.message);
+        console.error(e.message);
         return;
       }
     });

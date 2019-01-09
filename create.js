@@ -1,99 +1,78 @@
-var childProcess = require('child_process');
-var fs = require('fs');
-var path = require('path');
-var rimraf = require('rimraf');
-var copy = require('recursive-copy');
+const childProcess = require('child_process');
+const fs = require('fs-extra');
+const path = require('path');
 
-module.exports = function create(name, directory) {
+module.exports = async function create(name, directory) {
   console.log('Creating story "' + name + '" at ' + directory);
 
-  return new Promise(function promise(resolve, reject) {
-    var newDir = directory; 
-    fs.mkdir(newDir, function error(err) {
-      if (err) {
-        if (err.code === 'EEXIST') {
-          return reject(new Error('The directory, ' + newDir + ', already exists.'));
-        } else {
-          return reject(err);
-        }
-      }
+  const newDir = directory;
+  try {
+    await fs.mkdir(newDir);
+  } catch (err) {
+    if (err.code === 'EEXIST') {
+      throw new Error('The directory, ' + newDir + ', already exists.');
+    } else {
+      throw err;
+    }
+  }
 
-      writeTempPackageJson(newDir).then(function () {
-        installCore(newDir).then(function () {
-          moveCore(newDir).then(function () {
-            removeOldCore(newDir).then(function () {
-              modifyCoreForRedistribution(newDir, name).then(function () {
-                installProject(newDir).then(function () {
-                  console.log('Finished creating story ' + name + '.');
-                  resolve();
-                }, function (err) {
-                  return reject(err);  
-                });
-              }, function (err) {
-                return reject(err);
-              });
-            }, function (err) {
-              return reject(err);
-            });
-          }, function (err) {
-            return reject(err);
-          });
-        }, function (err) {
-          return reject(err);
-        });
-      }, function (err) {
-        return reject(err);
-      });
-    });
-  });
+  try {
+    await writeTempPackageJson(newDir);
+    await installCore(newDir);
+    await moveCore(newDir);
+    await removeOldCore(newDir);
+    await modifyCoreForRedistribution(newDir, name);
+    await installProject(newDir);
+    console.log('Finished creating story ' + name + '.');
+  } catch (err) {
+    console.error(err);
+  }
 };
 
-function writeTempPackageJson(directory) {
+async function writeTempPackageJson(directory) {
   console.log('Writing temporary package.json.');
 
-  var tempPackageJson = JSON.stringify({
+  const tempPackageJson = JSON.stringify({
     name: 'accelerator-temp',
     version: '0.0.0',
-    description: 'If you can see this, something went wrong.',
+    description: 'If you\'re reading this, something went wrong.',
   });
 
-  return new Promise(function promise(resolve, reject) {
-    fs.writeFile(path.join(directory, 'package.json'), tempPackageJson, null, function error(err) {
-      if (err && err.code !== 'EEXIST') {
-        return reject(err);
-      }
-  
-      resolve(err);
-    });
-  });
+  try {
+    await fs.writeFile(path.join(directory, 'package.json'), tempPackageJson);
+  } catch (err) {
+    if (err && err.code !== 'EEXIST') {
+      throw err;
+    }
+  }
 }
 
-function installCore(directory) {
+async function installCore(directory) {
   console.log('Installing accelerator-core.');
 
-  var cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  var args = [
+  const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  const args = [
     'install',
     'accelerator-core'
   ];
 
-  var spawnArgs = {
+  const spawnArgs = {
     cwd: directory,
   };
 
-  var child = childProcess.spawn(cmd, args, spawnArgs);
-  child.stdout.on('data', function (data) {
+  const child = childProcess.spawn(cmd, args, spawnArgs);
+  child.stdout.on('data', (data) => {
     console.log(data.toString());
   });
 
-  child.stderr.on('data', function (data) {
+  child.stderr.on('data', (data) => {
     console.log(data.toString());
   });
 
-  return new Promise(function promise(resolve, reject) {
-    child.on('exit', function (code) {
+  return new Promise((resolve, reject) => {
+    child.on('exit', (code) => {
       if (code) {
-        return reject('Core installation exited with code ' + code + '.');
+        return reject(`Core installation exited with code ${code}.`);
       }
 
       resolve();
@@ -101,125 +80,91 @@ function installCore(directory) {
   });
 }
 
-function moveCore(directory) {
+async function moveCore(directory) {
   console.log('Moving core contents to story folder.');
 
-  var coreDir = path.join(directory, 'node_modules', 'accelerator-core');
-  return new Promise(function promise(resolve, reject) {
-    var copyArgs = {
-      dot: true,
-      overwrite: true,
-    };
+  const coreDir = path.join(directory, 'node_modules', 'accelerator-core');
+  const copyArgs = {
+    dot: true,
+    overwrite: true,
+  };
 
-    copy(coreDir, directory, copyArgs, function cb(err) {
-      if (err) {
-        return reject(err);
-      }
+  try {
+    fs.copy(coreDir, directory, copyArgs);
+  } catch (e) {
 
-      resolve();
-    });
-  });
+  }
 }
 
-function removeOldCore(directory) {
+async function removeOldCore(directory) {
   console.log('Removing old core directory.');
 
-  var coreDir = path.join(directory, 'node_modules', 'accelerator_core');
-  return new Promise(function promise(resolve, reject) {
-    rimraf(coreDir, function (err) {
-      if (err) {
-        return reject(err);
-      }
-
-      resolve();
-    });
-  });
+  const coreDir = path.join(directory, 'node_modules', 'accelerator_core');
+  await fs.remove(coreDir);
 }
 
-function modifyCoreForRedistribution(directory, name) {
+async function modifyCoreForRedistribution(directory, name) {
   console.log('Modifying core for redistribution.');
-
-  return new Promise(function promise(resolve, reject) {
-    rewritePackageJson(directory).then(function () {
-      writeGitignore(directory).then(function () {
-        rewriteTslint(directory).then(function () {
-          renameCodeWorkspace(directory, name).then(function () {
-            console.log('Finished modifying core.');
-  
-            resolve();
-          }, function (err) {
-            return reject(err);
-          })
-        }, function (err) {
-          return reject(err);
-        }),
-      }, function (err) {
-        return reject(err);
-      });
-    }, function (err) {
-      return reject(err);
-    });
-  });
+  await rewritePackageJson(directory);
+  await writeGitignore(directory);
+  await rewriteTslint(directory);
+  await renameCodeWorkspace(directory, name);
+  console.log('Finished modifying core.');
 }
 
-function rewritePackageJson(directory) {
+async function rewritePackageJson(directory) {
   console.log('Rewriting package.json.');
   
-  var packagePath = path.join(directory, 'package.json');
+  const packagePath = path.join(directory, 'package.json');
 
-  return new Promise(function promise(resolve, reject) {
-    fs.readFile(packagePath, function (err, data) {
-      if (err) {
-        return reject(err);
-      }
+  const data = await fs.readFile(packagePath);
+  const corePackage;
+  try {
+    corePackage = JSON.parse(data.toString());
+  } catch (err) {
+    return reject(new Error('There was an error parsing the ' +
+                            'package.json file:',
+                            err));
+  }
 
-      var corePackage;
-      try {
-        corePackage = JSON.parse(data.toString());
-      } catch (err) {
-        return reject(new Error('There was an error parsing the ' +
-                                'package.json file:',
-                                err));
-      }
-
-      corePackage.name = 'untitled-accelerator-story';
-      corePackage.description = 'An untitled story built with Accelerator ' +
-                                '(accelerator-core, accelerator-tool).'
-      corePackage.version = '1.0.0';
-      corePackage.private = true;
-
-      /* Rewrite jest configuration so that the redist tests passages, headers,
-       * footers, and plugins, even though the core repo/package does not, and
-       * the redist does not test src/, even though the repo/package does. */
-      corePackage.jest.testMatch = [
-        '<rootDir>/(passages|headers|footers|plugins)/' +
-          '**/?(*.)(spec|test).(j|t)s?(x)',
-      ];
-
-      var keys = Object.keys(corePackage);
-      for (var ii = 0; ii < keys.length; ii += 1) {
-        if (keys[ii] === 'bundleDependencies' || keys[ii][0] === '_') {
-          delete corePackage[keys[ii]];
-        }
-      }
-
-      fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2), function (err) {
-        if (err) {
-          return reject(err);
-        }
-        
-        resolve();
-      });
-    });
+  /* Keep most important properties on top of the file. */
+  corePackage = Object.assign({}, corePackage, {
+    name: 'untitled-accelerator-story',
+    description: 'An untitled story built with Accelerator ' +
+                  '(accelerator-core, accelerator-tool).',
+    version: '1.0.0',
+    private: true,
   });
+
+  /* Rewrite jest configuration so that the redist tests passages, headers,
+    * footers, and plugins, even though the core repo/package does not, and
+    * the redist does not test src/, even though the repo/package does. */
+  corePackage.jest.testMatch = [
+    '<rootDir>/(passages|headers|footers|plugins)/' +
+    '**/?(*.)(spec|test).(j|t)s?(x)',
+  ];
+
+  delete corePackage.author;
+  delete corePackage.bugs;
+  delete corePackage.bundleDependencies;
+  delete corePackage.repository;
+
+  const keys = Object.keys(corePackage);
+  for (const ii = 0; ii < keys.length; ii += 1) {
+    if (keys[ii][0] === '_') {
+      delete corePackage[keys[ii]];
+    }
+  }
+
+  await fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2));
 }
 
-function writeGitignore(directory) {
+async function writeGitignore(directory) {
   console.log('Rewriting .gitignore.');
 
-  var gitignorePath = path.join(directory, '.gitignore');
+  const gitignorePath = path.join(directory, '.gitignore');
 
-  var gitignore =
+  const gitignore =
     '# See https://help.github.com/ignore-files/ for more about ignoring files.\n' +
     '\n' +
     '# dependencies\n' +
@@ -242,80 +187,51 @@ function writeGitignore(directory) {
     'yarn-debug.log*\n' +
     'yarn-error.log*\n';
 
-  return new Promise(function promise(resolve, reject) {
-    fs.writeFile(gitignorePath, gitignore, function cb(err) {
-      if (err) {
-        return reject(err);
-      }
-
-      resolve();
-    });
-  });
+  await fs.writeFile(gitignorePath, gitignore);
 }
 
-function rewriteTslint(directory) {
+async function rewriteTslint(directory) {
   console.log('Rewriting tslint.json.');
   
-  var tslintConfigPath = path.join(directory, 'tslint.json');
+  const tslintConfigPath = path.join(directory, 'tslint.json');
 
-  return new Promise(function promise(resolve, reject) {
-    fs.readFile(tslintConfigPath, function (err, data) {
-      if (err) {
-        return reject(err);
-      }
+  const data = await fs.readFile(tslintConfigPath);
+  const lintConfig;
+  try {
+    lintConfig = JSON.parse(data.toString());
+  } catch (err) {
+    return reject(new Error('There was an error parsing the ' +
+                            'package.json file:',
+                            err));
+  }
 
-      var lintConfig;
-      try {
-        lintConfig = JSON.parse(data.toString());
-      } catch (err) {
-        return reject(new Error('There was an error parsing the ' +
-                                'package.json file:',
-                                err));
-      }
+  /* Do not lint source files in redists. */
+  lintConfig.linterOptions.exclude.push(
+    'src/',
+  );
 
-      /* Do not lint source files in redists. */
-      lintConfig.linterOptions.exclude.push(
-        'src/'
-      );
-
-      fs.writeFile(tslintConfigPath, JSON.stringify(lintConfig, null, 2), function (err) {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve();
-      });
-    });
-  });
+  await fs.writeFile(tslintConfigPath, JSON.stringify(lintConfig, null, 2));
 }
 
-function renameCodeWorkspace(directory, name) {
+async function renameCodeWorkspace(directory, name) {
   console.log('Renaming code-workspace file.');
 
-  var from = path.join(directory, 'accelerator-core.code-workspace');
-  var to = path.join(directory, name + '.code-workspace');
-  return new Promise(function promise(resolve, reject) {
-    fs.rename(from, to, function cb(err) {
-      if (err) {
-        return reject(err);
-      }
-
-      resolve();
-    });
-  })
+  const from = path.join(directory, 'accelerator-core.code-workspace');
+  const to = path.join(directory, name + '.code-workspace');
+  await fs.rename(from, to);
 }
 
-function installProject(directory) {
+async function installProject(directory) {
   console.log('Installing project dependencies.');
 
-  var cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  var args = [ 'install', ];
+  const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  const args = [ 'install', ];
 
-  var spawnArgs = {
+  const spawnArgs = {
     cwd: directory,
   };
 
-  var child = childProcess.spawn(cmd, args, spawnArgs);
+  const child = childProcess.spawn(cmd, args, spawnArgs);
   child.stdout.on('data', function (data) {
     console.log(data.toString());
   });
