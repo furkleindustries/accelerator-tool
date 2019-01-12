@@ -245,6 +245,9 @@ async function makeNewAsset(args) {
   }
 }
 
-function makeGenericTemplateReplacements(args) {
-  return args.data.toString().split('%NAME%').join(args.name);
+function makeGenericTemplateReplacements({
+  data,
+  name,
+}) {
+  return data.toString().split('%NAME%').join(name);
 }
