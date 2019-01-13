@@ -248,6 +248,7 @@ async function makeNewAsset(args) {
 function makeGenericTemplateReplacements({
   data,
   name,
-}) {
+})
+{
   return data.toString().split('%NAME%').join(name);
 }
