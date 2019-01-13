@@ -1,29 +1,37 @@
 const childProcess = require('child_process');
 const fs = require('fs-extra');
+const idIsValid = require('./functions/idIsValid');
 const path = require('path');
 
 module.exports = async function create(name, directory) {
-  console.log('Creating story "' + name + '" at ' + directory);
+  console.log(`Creating story "${name}" at ${directory}.`);
+
+  if (!idIsValid(name)) {
+    throw new Error('The provided name is invalid.');
+  }
 
   const newDir = directory;
   try {
     await fs.mkdir(newDir);
   } catch (err) {
     if (err.code === 'EEXIST') {
-      throw new Error('The directory, ' + newDir + ', already exists.');
+      throw new Error(`The directory, ${newDir}, already exists.`);
     } else {
       throw err;
     }
   }
 
   try {
-    await writeTempPackageJson(newDir);
-    await installCore(newDir);
+    await Promise.all([
+      writeTempPackageJson(newDir),
+      installCore(newDir),
+    ]);
+
     await moveCore(newDir);
     await removeOldCore(newDir);
     await modifyCoreForRedistribution(newDir, name);
     await installProject(newDir);
-    console.log('Finished creating story ' + name + '.');
+    console.log(`Finished creating story ${name}.`);
   } catch (err) {
     console.error(err);
   }
@@ -53,21 +61,13 @@ async function installCore(directory) {
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const args = [
     'install',
-    'accelerator-core'
+    'accelerator-core',
   ];
 
-  const spawnArgs = {
-    cwd: directory,
-  };
-
+  const spawnArgs = { cwd: directory };
   const child = childProcess.spawn(cmd, args, spawnArgs);
-  child.stdout.on('data', (data) => {
-    console.log(data.toString());
-  });
-
-  child.stderr.on('data', (data) => {
-    console.log(data.toString());
-  });
+  child.stdout.on('data', (data) => console.log(String(data)));
+  child.stderr.on('data', (data) => console.error(String(data)));
 
   return new Promise((resolve, reject) => {
     child.on('exit', (code) => {
@@ -75,7 +75,7 @@ async function installCore(directory) {
         return reject(`Core installation exited with code ${code}.`);
       }
 
-      resolve();
+      return resolve();
     });
   });
 }
@@ -89,11 +89,7 @@ async function moveCore(directory) {
     overwrite: true,
   };
 
-  try {
-    fs.copy(coreDir, directory, copyArgs);
-  } catch (e) {
-
-  }
+  await fs.copy(coreDir, directory, copyArgs);
 }
 
 async function removeOldCore(directory) {
@@ -105,10 +101,14 @@ async function removeOldCore(directory) {
 
 async function modifyCoreForRedistribution(directory, name) {
   console.log('Modifying core for redistribution.');
-  await rewritePackageJson(directory);
-  await writeGitignore(directory);
-  await rewriteTslint(directory);
-  await renameCodeWorkspace(directory, name);
+
+  await Promise.all([
+    rewritePackageJson(directory),
+    writeGitignore(directory),
+    rewriteTslint(directory),
+    renameCodeWorkspace(directory, name),
+  ]);
+
   console.log('Finished modifying core.');
 }
 
@@ -120,7 +120,7 @@ async function rewritePackageJson(directory) {
   const data = await fs.readFile(packagePath);
   const corePackage;
   try {
-    corePackage = JSON.parse(data.toString());
+    corePackage = JSON.parse(String(data));
   } catch (err) {
     return reject(new Error('There was an error parsing the ' +
                             'package.json file:',
@@ -128,17 +128,18 @@ async function rewritePackageJson(directory) {
   }
 
   /* Keep most important properties on top of the file. */
-  corePackage = Object.assign({}, corePackage, {
+  corePackage = {
+    ...corePackage,
     name: 'untitled-accelerator-story',
     description: 'An untitled story built with Accelerator ' +
                   '(accelerator-core, accelerator-tool).',
     version: '1.0.0',
     private: true,
-  });
+  };
 
   /* Rewrite jest configuration so that the redist tests passages, headers,
-    * footers, and plugins, even though the core repo/package does not, and
-    * the redist does not test src/, even though the repo/package does. */
+   * footers, and plugins, even though the core repo/package does not, and
+   * the redist does not test src/, even though the repo/package does. */
   corePackage.jest.testMatch = [
     '<rootDir>/(passages|headers|footers|plugins)/' +
     '**/?(*.)(spec|test).(j|t)s?(x)',
@@ -201,15 +202,11 @@ async function rewriteTslint(directory) {
     lintConfig = JSON.parse(data.toString());
   } catch (err) {
     return reject(new Error('There was an error parsing the ' +
-                            'package.json file:',
-                            err));
+                            `package.json file: ${err}.`));
   }
 
   /* Do not lint source files in redists. */
-  lintConfig.linterOptions.exclude.push(
-    'src/',
-  );
-
+  lintConfig.linterOptions.exclude.push('src/');
   await fs.writeFile(tslintConfigPath, JSON.stringify(lintConfig, null, 2));
 }
 
@@ -217,7 +214,7 @@ async function renameCodeWorkspace(directory, name) {
   console.log('Renaming code-workspace file.');
 
   const from = path.join(directory, 'accelerator-core.code-workspace');
-  const to = path.join(directory, name + '.code-workspace');
+  const to = path.join(directory, `${name}.code-workspace`);
   await fs.rename(from, to);
 }
 
@@ -225,28 +222,20 @@ async function installProject(directory) {
   console.log('Installing project dependencies.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const args = [ 'install', ];
+  const args = [ 'install' ];
 
-  const spawnArgs = {
-    cwd: directory,
-  };
-
+  const spawnArgs = { cwd: directory };
   const child = childProcess.spawn(cmd, args, spawnArgs);
-  child.stdout.on('data', function (data) {
-    console.log(data.toString());
-  });
+  child.stdout.on('data', (data) => console.log(String(data)));
+  child.stderr.on('data', (data) => console.error(String(data)));
 
-  child.stderr.on('data', function (data) {
-    console.log(data.toString());
-  });
-
-  return new Promise(function promise(resolve, reject) {
-    child.on('exit', function (code) {
+  return new Promise((resolve, reject) => {
+    child.on('exit', (code) => {
       if (code) {
-        return reject('Project installation exited with code ' + code + '.');
+        return reject(`Project installation exited with code ${code}.`);
       }
 
-      resolve();
+      return resolve();
     });
   });
 }

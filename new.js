@@ -1,7 +1,12 @@
 const fs = require('fs');
+const idIsValid = require('./functions/idIsValid');
 const path = require('path');
 
 module.exports = async function _new(noun, name, directory) {
+  if (!idIsValid(name)) {
+    throw new Error('The name provided was invalid.');
+  }
+
   try {
     await checkForFilepathReqs(directory);
   } catch (e) {
