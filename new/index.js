@@ -1,5 +1,5 @@
 const checkForFilepathReqs = require('./checkForFilepathReqs');
-const nameIsValid = require('../functions/idIsValid');
+const nameIsValid = require('../functions/nameIsValid');
 const makeNewFooter = require('./makeNewFooter');
 const makeNewHeader = require('./makeNewHeader');
 const makeNewPassage = require('./makeNewPassage');
