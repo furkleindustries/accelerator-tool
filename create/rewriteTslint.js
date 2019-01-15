@@ -7,12 +7,12 @@ module.exports = async function rewriteTslint(directory) {
   const tslintConfigPath = path.join(directory, 'tslint.json');
 
   const data = await fs.readFile(tslintConfigPath);
-  const lintConfig;
+  let lintConfig;
   try {
     lintConfig = JSON.parse(data.toString());
   } catch (err) {
-    return reject(new Error('There was an error parsing the ' +
-                            `package.json file: ${err}.`));
+    throw new Error('There was an error parsing the package.json file: ' +
+                    `${err}.`);
   }
 
   /* Do not lint source files in redists. */

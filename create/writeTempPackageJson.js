@@ -10,11 +10,5 @@ module.exports = async function writeTempPackageJson(directory) {
     description: 'If you\'re reading this, something went wrong.',
   });
 
-  try {
-    await fs.writeFile(path.join(directory, 'package.json'), tempPackageJson);
-  } catch (err) {
-    if (err && err.code !== 'EEXIST') {
-      throw err;
-    }
-  }
+  await fs.writeFile(path.join(directory, 'package.json'), tempPackageJson);
 };

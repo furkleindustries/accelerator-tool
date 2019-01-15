@@ -1,4 +1,4 @@
-module.exports = function nameIsValname(name) {
+module.exports = function nameIsValid(name) {
   if (!name) {
     return new Error('No name was provided.');
   } else if (typeof name !== 'string') {
