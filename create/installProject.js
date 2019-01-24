@@ -1,6 +1,6 @@
 const childProcess = require('child_process');
 
-module.exports = async function installProject(directory) {
+module.exports = function installProject(directory) {
   console.log('Installing project dependencies.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';

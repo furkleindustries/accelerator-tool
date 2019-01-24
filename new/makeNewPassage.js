@@ -8,12 +8,12 @@ module.exports = async function makeNewPassage(type, directory, name) {
                     '"passage-ts" nor "passage-js".');
   }
 
-  const codeExtension = type === 'passage-js' ? '.jsx' : '.tsx'
+  const codeExtension = type === 'passage-js' ? '.jsx' : '.tsx';
   const destinationDir = path.join(directory, 'passages');
   const includeStyle = true;
   const templatesDir = path.join(directory, 'templates', type);
 
-  return await makeNewAsset({
+  const passage = await makeNewAsset({
     codeExtension,
     destinationDir,
     includeStyle,
@@ -21,4 +21,6 @@ module.exports = async function makeNewPassage(type, directory, name) {
     templatesDir,
     type: 'passage',
   });
+
+  return passage;
 };

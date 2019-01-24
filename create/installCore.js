@@ -1,6 +1,6 @@
 const childProcess = require('child_process');
 
-module.exports = async function installCore(directory) {
+module.exports = function installCore(directory) {
   console.log('Installing accelerator-core.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';

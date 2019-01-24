@@ -26,5 +26,8 @@
   "dependencies": {
     "commander": "^2.19.0",
     "fs-extra": "^7.0.1"
+  },
+  "devDependencies": {
+    "ts-assertions": "^1.0.11"
   }
 }
