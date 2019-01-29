@@ -17,6 +17,7 @@ module.exports = async function writeGitignore(directory) {
     '\n' +
     '# production\n' +
     '/build*/\n' +
+    '/.zips/\n' +
     '\n' +
     '# misc\n' +
     '.DS_Store\n' +
@@ -25,9 +26,7 @@ module.exports = async function writeGitignore(directory) {
     '.env.test.local\n' +
     '.env.production.local\n' +
     '\n' +
-    'npm-debug.log*\n' +
-    'yarn-debug.log*\n' +
-    'yarn-error.log*\n';
+    '*.log*\n' +
 
   await fs.writeFile(gitignorePath, gitignore);
 };
