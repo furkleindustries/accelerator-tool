@@ -6,7 +6,7 @@ module.exports = async function rewriteTslint(directory) {
   
   const tslintConfigPath = path.join(directory, 'tslint.json');
 
-  const data = await fs.readFile(tslintConfigPath);
+  const data = await fs.readFile(tslintConfigPath, 'utf8');
   let lintConfig;
   try {
     lintConfig = JSON.parse(data.toString());

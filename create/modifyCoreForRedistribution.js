@@ -1,18 +1,19 @@
 const renameCodeWorkspace = require('./renameCodeWorkspace');
+const rewriteConfig = require('./rewriteConfig');
 const rewriteIndexHtml = require('./rewriteIndexHtml');
 const rewritePackageJson = require('./rewritePackageJson');
 const rewriteTslint = require('./rewriteTslint');
-const writeGitignore = require('./writeGitIgnore');
 
 module.exports = async function modifyCoreForRedistribution(directory, name) {
   console.log('Modifying core for redistribution.');
 
+  const config = await rewriteConfig(directory, name);
+
   await Promise.all([
-    rewritePackageJson(directory),
-    rewriteIndexHtml(directory),
-    rewriteTslint(directory),
-    writeGitignore(directory),
     renameCodeWorkspace(directory, name),
+    rewriteIndexHtml(directory, config),
+    rewritePackageJson(directory),
+    rewriteTslint(directory),
   ]);
 
   console.log('Finished modifying core.');
