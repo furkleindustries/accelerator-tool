@@ -36,7 +36,7 @@ module.exports = async function rewritePackageJson(directory) {
 
   Object.keys(corePackage).forEach((key) => {
     if (key[0] === '_' || toDelete.includes(key)) {
-      delete corePackage[keys[ii]];
+      delete corePackage[key];
     }
   });
 

@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new passages within them.",
   "main": "index.js",
-  "bin": "index.js",
+  "bin": "./index.js",
   "scripts": {
     "test": "jest"
   },

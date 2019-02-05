@@ -24,4 +24,5 @@ module.exports = async function create(name, directory) {
   await installProject(directory);
 
   console.log(`Finished creating story "${name}" at ${directory}.`);
+  console.log('\nHappy developing!');
 };
