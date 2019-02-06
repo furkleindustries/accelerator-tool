@@ -10,7 +10,7 @@ module.exports = async function writeTempPackageJson(directory) {
   const tempPackageJson = JSON.stringify({
     description: somethingWentWrongIfYouSawThis,
     name: '__accelerator-story-creation-TEMP',
-    license: somethingWentWrongIfYouSawThis,
+    license: 'GPL-3.0-only',
     repository: somethingWentWrongIfYouSawThis,
     version: '0.0.0',
   });
