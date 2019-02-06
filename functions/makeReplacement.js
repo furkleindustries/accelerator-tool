@@ -21,7 +21,8 @@ module.exports = function makeReplacement(data, key, value) {
   assert(key && typeof key === 'string', strings.KEY_INVALID);
   assert(typeof value !== 'undefined' && value !== null, strings.VALUE_INVALID);
 
-  return data.split(key).join(value);
+  const valueStr = typeof value === 'object' ? JSON.stringify(value) : value;
+  return data.split(key).join(valueStr);
 };
 
 
