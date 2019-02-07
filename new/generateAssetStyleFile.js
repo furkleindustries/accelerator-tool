@@ -1,9 +1,11 @@
+const chalk = require('chalk');
 const fs = require('fs-extra');
 const log = require('../logging/log');
 const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
 const path = require('path');
 
 module.exports = async function generateAssetStyleFile({
+  config,
   forceCss,
   name,
   newAssetDir,
@@ -19,19 +21,20 @@ module.exports = async function generateAssetStyleFile({
       (forceCss ? 'css' : 'scss'),
   );
 
-  log(`Reading style template from ${styleTemplatePath}.`);
+  log(`Reading style template from "${chalk.bold(styleTemplatePath)}".`);
 
   const data = await fs.readFile(styleTemplatePath);
   log('Rewriting style template.');
 
   const rewrittenData = makeTemplateReplacements({
+    config,
     data,
     name,
   });
 
   const newStylePath = path.join(newAssetDir, name + '.scss');
 
-  log(`Writing style template to ${newStylePath}.`);
+  log(`Writing style template to "${chalk.bold(newStylePath)}".`);
 
   await fs.writeFile(newStylePath, rewrittenData);
 };

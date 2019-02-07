@@ -7,13 +7,21 @@ module.exports = function makeTemplateReplacements({
   config,
   data,
   dontReplacePublicUrl,
+  name,
 })
 {
-  assert(config);
+  assert(
+    config,
+    'The config argument was not provided to makeTemplateReplacements.',
+  );
+
+  delete config.name;
 
   if (dontReplacePublicUrl) {
     delete config.publicUrl;
   }
+
+  let updated = makeReplacement(data, 'name', name);
 
   return Object.keys(config).reduce((prev, key) => (
     makeReplacement(
@@ -21,5 +29,5 @@ module.exports = function makeTemplateReplacements({
       `%${key}%`,
       config[key],
     )
-  ), data);
+  ), updated);
 };

@@ -5,6 +5,7 @@ const path = require('path');
 
 module.exports = async function generateAssetTestFile({
   codeExtension,
+  config,
   name,
   newAssetDir,
   templatesDir,
@@ -23,6 +24,7 @@ module.exports = async function generateAssetTestFile({
   log('Rewriting test template.');
 
   const rewrittenData = makeTemplateReplacements({
+    config,
     data,
     name,
   });

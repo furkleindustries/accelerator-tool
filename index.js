@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
 const error = require('./logging/error');
+
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.error(require('chalk').red(error.message));
+  process.exit(1);
+});
+
 const getDirectory = require('./functions/getDirectory');
 const getNewAssetTypes = require('./functions/getInputNouns');
 const program = require('commander');

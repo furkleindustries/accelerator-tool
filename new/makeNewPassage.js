@@ -2,6 +2,7 @@ const makeNewAsset = require('./makeNewAsset');
 const path = require('path');
 
 module.exports = async function makeNewPassage({
+  config,
   directory,
   forceCss,
   forceJavaScript,
@@ -15,6 +16,7 @@ module.exports = async function makeNewPassage({
   const templatesDir = path.join(directory, 'templates', type);
 
   return await makeNewAsset({
+    config,
     destinationDir,
     forceCss,
     forceJavaScript,

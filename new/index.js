@@ -14,11 +14,7 @@ module.exports = async function _new({
   type,
 })
 {
-  log(
-    'Creating ' +
-    (type.endsWith('js') ? 'JavaScript' : 'TypeScript') +
-    ` ${type} "${chalk.bold(name)}".`
-  );
+  log(`Creating ${type} "${chalk.bold(name)}".`);
 
   const validState = nameIsValid(name);
   if (validState instanceof Error) {
@@ -35,5 +31,5 @@ module.exports = async function _new({
     noTests,
   });
 
-  log(`${type} "${chalk.bold(name)}", created.`);
+  log(`${type[0].toUpperCase()}${type.slice(1)} "${chalk.bold(name)}" created.`);
 };

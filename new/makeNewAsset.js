@@ -7,6 +7,7 @@ const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function makeNewAsset({
+  config,
   destinationDir,
   forceCss,
   forceJavaScript,
@@ -36,6 +37,7 @@ module.exports = async function makeNewAsset({
 
   generateAssetCodeFile({
     codeExtension,
+    config,
     name,
     newAssetDir,
     templatesDir,

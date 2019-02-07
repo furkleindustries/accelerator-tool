@@ -18,7 +18,7 @@ module.exports = function getAssetCreationFunction(type) {
 
   assert(
     typeof func === 'function',
-    'The normalized noun has not been implemented.',
+    'The type has not been implemented.',
   );
 
   return func;
