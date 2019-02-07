@@ -1,51 +1,75 @@
 #!/usr/bin/env node
 
-const program = require('commander');
-const fs = require('fs-extra');
-const path = require('path');
-
+const error = require('./logging/error');
 const getDirectory = require('./functions/getDirectory');
-const getInputNouns = require('./new/getInputNouns');
+const getNewAssetTypes = require('./functions/getInputNouns');
+const program = require('commander');
+const path = require('path');
 
 const package = require('./package.json');
 
-program.version(package.version);
+program.version(package.version, '-v, -V, --version');
 
 program
   .command('create <name> [directory]')
   .description('Create a new Accelerator story.')
   .action(async (name, directory) =>
   {
-    if (name === 'new' || getInputNouns().indexOf(name) !== -1) {
-      console.log(`You provided a reserved word, ${name}, for a ` +
-                  'story name. Did you mean to use accelerator-tool new?');
-      return;
-    }
-
     const realDir = getDirectory(directory);
     try {
       await require('./create/')(name, path.join(realDir, name));
-    } catch (e) {
-      console.error(e);
-      return;
+    } catch (err) {
+      error(err);
+      process.exit(1);
     }
   });
 
 program
-  .command('new <noun> <name> [directory]')
+  .command('new <type> <name> [directory]')
   .description('Create a new asset in an existing Accelerator story. ' +
-               `Available subcommands are ${getInputNouns().join(', ')}. ` +
-               'Note that passage, passage-ts, and passage-tsx are ' +
-               'equivalent, passage-js and passage-jsx are equivalent, etc.')
-  .action(async (noun, name, directory) =>
+               `Available subcommands are: ${getNewAssetTypes().join(', ')}.`)
+  .option(
+    '-j, --javascript',
+    'Generate JavaScript code files instead of TypeScript files for the new ' +
+      'asset.',
+  )
+  .option(
+    '-c, --css',
+    'Generate CSS style files instead of Sass files.',
+  )
+  .options(
+    '--no-css-modules',
+    'Do not use CSS Modules with the generated style files.',
+  )
+  .option(
+    '--no-tests',
+    'Do not generate tests for this asset.',
+  )
+  .action(async (type, name, directory, cmd) =>
   {
     const realDir = getDirectory(directory);
     try {
-      await require('./new/')(noun, name, realDir);
-    } catch (e) {
-      console.error(e);
-      return;
+      await require('./new')({
+        name,
+        type,
+        directory: realDir,
+        forceCss: Boolean(cmd.css),
+        noCssModules: Boolean(cmd.noCssModules),
+        noTests: Boolean(cmd.noTests),
+        typescript: !cmd.javascript,
+      });
+    } catch (err) {
+      error(err);
+      process.exit(1);
     }
   });
 
+program
+  .option('-h')
+  .action(program.outputHelp)
+
 program.parse(process.argv);
+
+if (!program.args.length) {
+  program.outputHelp();
+}

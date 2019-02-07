@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = function generateAssetTestFile({
@@ -14,11 +15,11 @@ module.exports = function generateAssetTestFile({
     `${type}.test${codeExtension}`,
   );
 
-  console.log(`Reading test template from ${testTemplatePath}.`);
+  log(`Reading test template from ${testTemplatePath}.`);
 
   const data = fs.readFile(testTemplatePath);
 
-  console.log('Rewriting test template.');
+  log('Rewriting test template.');
 
   const rewrittenData = makeTemplateReplacements({
     data,
@@ -27,7 +28,7 @@ module.exports = function generateAssetTestFile({
 
   const newTestPath = path.join(newAssetDir, `${name}.test${codeExtension}`);
 
-  console.log(`Writing test template to ${newTestPath}.`);
+  log(`Writing test template to ${newTestPath}.`);
 
   await fs.writeFile(newTestPath, rewrittenData);
-}
+};

@@ -1,16 +1,20 @@
-const idIsValid = require('../functions/nameIsValid');
+const chalk = require('chalk');
 const installCore = require('./installCore');
 const installProject = require('./installProject');
+const log = require('../logging/log');
 const makeStoryDirectory = require('./makeStoryDirectory');
 const modifyCoreForRedistribution = require('./modifyCoreForRedistribution');
 const moveCore = require('./moveCore');
+const nameIsValid = require('../functions/nameIsValid');
 const removeOldCore = require('./removeOldCore');
 const writeTempPackageJson = require('./writeTempPackageJson');
 
 module.exports = async function create(name, directory) {
-  console.log(`Creating story "${name}" at ${directory}.`);
+  log(
+    `Creating story "${chalk.bold(name)}" at "${chalk.bold(directory)}".`,
+  );
 
-  const validState = idIsValid(name);
+  const validState = nameIsValid(name);
   if (validState instanceof Error) {
     throw validState;
   }
@@ -23,6 +27,12 @@ module.exports = async function create(name, directory) {
   await modifyCoreForRedistribution(directory, name);
   await installProject(directory);
 
-  console.log(`Finished creating story "${name}" at ${directory}.`);
-  console.log('\nHappy developing!');
+  log(
+    `Finished creating story "${chalk.bold(name)}" at ` +
+    `"${chalk.bold(directory)}".\n`
+  );
+
+  log('Happy developing! Accelerator is made with ' +
+      `${chalk.red('❤')}️ (love) by Furkle Industries. Remember: fiction ` +
+      'can and should make the world a better place.');
 };

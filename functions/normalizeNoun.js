@@ -1,4 +1,4 @@
-const nounNormalizationTable = require('./nounNormalizationTable');
+const nounNormalizationTable = require('./getNounNormalizationTable');
 
 module.exports = function normalizeNoun(noun) {
   const normalized = String(nounNormalizationTable[noun]);

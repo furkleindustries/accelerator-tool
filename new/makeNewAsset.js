@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const generateAssetCodeFile = require('./generateAssetCodeFile');
 const generateAssetStyleFile = require('./generateAssetStyleFile');
 const generateAssetTestFile = require('./generateAssetTestFile');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function makeNewAsset({
@@ -15,7 +16,7 @@ module.exports = async function makeNewAsset({
 {
   const newAssetDir = path.join(destinationDir, name);
 
-  console.log(`Creating new ${type} directory at ${newAssetDir}.`);
+  log(`Creating new ${type} directory at ${newAssetDir}.`);
 
   try {
     await fs.mkdir(destinationDir);

@@ -1,8 +1,9 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function checkForFilepathReqs(directory) {
-  console.log('Checking filepath requirements.');
+  log('Checking filepath requirements.');
 
   const dirExists = await fs.exists(directory);
   if (!dirExists) {

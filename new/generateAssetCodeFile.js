@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function generateAssetCodeFile({
@@ -11,11 +12,11 @@ module.exports = async function generateAssetCodeFile({
 {
   const codeTemplatePath = path.join(templatesDir, `${type}${codeExtension}`);
 
-  console.log(`Reading code template at ${codeTemplatePath}.`);
+  log(`Reading code template at ${codeTemplatePath}.`);
 
   const data = await fs.readFile(codeTemplatePath, 'utf8');
 
-  console.log('Rewriting code template.');
+  log('Rewriting code template.');
 
   const rewrittenData = makeTemplateReplacements({
     data,
@@ -24,7 +25,7 @@ module.exports = async function generateAssetCodeFile({
 
   const newCodePath = path.join(newAssetDir, `${name}${codeExtension}`);
 
-  console.log(`Writing code template to ${newCodePath}`);
+  log(`Writing code template to ${newCodePath}`);
 
   await fs.writeFile(newCodePath, rewrittenData);
 };

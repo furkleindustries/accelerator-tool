@@ -1,8 +1,9 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function rewriteTslint(directory) {
-  console.log('Rewriting tslint.json.');
+  log('Rewriting tslint.json.');
   
   const tslintConfigPath = path.join(directory, 'tslint.json');
 

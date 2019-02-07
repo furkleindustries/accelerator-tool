@@ -1,9 +1,10 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function rewritePackageJson(directory) {
-  console.log('Rewriting package.json.');
-  
+  log('Rewriting package.json.');
+
   const packagePath = path.join(directory, 'package.json');
 
   const data = await fs.readFile(packagePath, 'utf8');

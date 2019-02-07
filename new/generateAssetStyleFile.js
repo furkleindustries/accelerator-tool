@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function generateAssetStyleFile({
@@ -9,10 +10,10 @@ module.exports = async function generateAssetStyleFile({
 })
 {
   const styleTemplatePath = path.join(templatesDir, type + '.scss');
-  console.log(`Reading style template from ${styleTemplatePath}.`);
+  log(`Reading style template from ${styleTemplatePath}.`);
 
   const data = await fs.readFile(styleTemplatePath);
-  console.log('Rewriting style template.');
+  log('Rewriting style template.');
 
   const rewrittenData = makeTemplateReplacements({
     data,
@@ -21,7 +22,7 @@ module.exports = async function generateAssetStyleFile({
 
   const newStylePath = path.join(newAssetDir, name + '.scss');
 
-  console.log(`Writing style template to ${newStylePath}.`);
+  log(`Writing style template to ${newStylePath}.`);
 
   await fs.writeFile(newStylePath, rewrittenData);
 };

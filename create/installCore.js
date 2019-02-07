@@ -1,7 +1,10 @@
 const childProcess = require('child_process');
+const log = require('../logging/log');
+const npmErrorWithColor = require('../logging/npmErrorWithColor');
+const npmLogWithColor = require('../logging/npmLogWithColor');
 
 module.exports = function installCore(directory) {
-  console.log('Installing accelerator-core.');
+  log('Installing accelerator-core.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const args = [
@@ -11,8 +14,8 @@ module.exports = function installCore(directory) {
 
   const spawnArgs = { cwd: directory };
   const child = childProcess.spawn(cmd, args, spawnArgs);
-  child.stdout.on('data', (data) => console.log(String(data)));
-  child.stderr.on('data', (data) => console.error(String(data)));
+  child.stdout.on('data', npmLogWithColor);
+  child.stderr.on('data', npmErrorWithColor);
 
   return new Promise((resolve, reject) => {
     child.on('exit', (code) => {

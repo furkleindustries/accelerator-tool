@@ -1,8 +1,9 @@
 const fs = require('fs-extra');
+const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function moveCore(directory) {
-  console.log('Moving core contents to story folder.');
+  log('Moving core contents to story folder.');
 
   const coreDir = path.join(directory, 'node_modules', 'accelerator-core');
   const copyArgs = {
