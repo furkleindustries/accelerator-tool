@@ -1,5 +1,7 @@
+const chalk = require('chalk');
 const fs = require('fs-extra');
 const log = require('../logging/log');
+const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
 const path = require('path');
 
 module.exports = async function generateAssetCodeFile({
@@ -12,7 +14,7 @@ module.exports = async function generateAssetCodeFile({
 {
   const codeTemplatePath = path.join(templatesDir, `${type}${codeExtension}`);
 
-  log(`Reading code template at ${codeTemplatePath}.`);
+  log(`Reading code template at "${chalk.bold(codeTemplatePath)}".`);
 
   const data = await fs.readFile(codeTemplatePath, 'utf8');
 

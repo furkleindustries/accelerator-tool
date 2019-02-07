@@ -1,8 +1,9 @@
 const fs = require('fs-extra');
 const log = require('../logging/log');
+const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
 const path = require('path');
 
-module.exports = function generateAssetTestFile({
+module.exports = async function generateAssetTestFile({
   codeExtension,
   name,
   newAssetDir,

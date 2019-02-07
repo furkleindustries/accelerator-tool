@@ -1,11 +1,11 @@
-module.exports = function processLogLine(value, color, bgColor) {
+module.exports = function processLogLine(value, colorFormatter, bgColorFormatter) {
   let output = String(value);
-  if (typeof color === 'function') {
-    output = color(output);
+  if (typeof colorFormatter === 'function') {
+    output = colorFormatter(output);
   }
 
-  if (typeof bgColor === 'function') {
-    output = bgColor(output);
+  if (typeof bgColorFormatter === 'function') {
+    output = bgColorFormatter(output);
   }
 
   return output;

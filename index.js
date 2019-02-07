@@ -37,7 +37,7 @@ program
     '-c, --css',
     'Generate CSS style files instead of Sass files.',
   )
-  .options(
+  .option(
     '--no-css-modules',
     'Do not use CSS Modules with the generated style files.',
   )
@@ -56,7 +56,7 @@ program
         forceCss: Boolean(cmd.css),
         noCssModules: Boolean(cmd.noCssModules),
         noTests: Boolean(cmd.noTests),
-        typescript: !cmd.javascript,
+        forceJavaScript: !cmd.javascript,
       });
     } catch (err) {
       error(err);

@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const fs = require('fs-extra');
 const generateAssetCodeFile = require('./generateAssetCodeFile');
 const generateAssetStyleFile = require('./generateAssetStyleFile');
@@ -6,17 +7,20 @@ const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function makeNewAsset({
-  codeExtension,
   destinationDir,
+  forceCss,
+  forceJavaScript,
   includeStyle,
   name,
+  noCssModules,
+  noTests,
   templatesDir,
   type,
 })
 {
   const newAssetDir = path.join(destinationDir, name);
 
-  log(`Creating new ${type} directory at ${newAssetDir}.`);
+  log(`Creating new ${type} directory at "${chalk.bold(newAssetDir)}".`);
 
   try {
     await fs.mkdir(destinationDir);
@@ -28,6 +32,8 @@ module.exports = async function makeNewAsset({
 
   await fs.mkdir(newAssetDir);
 
+  const codeExtension = forceJavaScript ? '.jsx' : '.tsx';
+
   generateAssetCodeFile({
     codeExtension,
     name,
@@ -36,18 +42,22 @@ module.exports = async function makeNewAsset({
     type,
   });
 
-  generateAssetTestFile({
-    codeExtension,
-    name,
-    newAssetDir,
-    templatesDir,
-    type,
-  });
+  if (!noTests) {
+    generateAssetTestFile({
+      codeExtension,
+      name,
+      newAssetDir,
+      templatesDir,
+      type,
+    });
+  }
 
   if (includeStyle) {
     generateAssetStyleFile({
+      forceCss,
       name,
       newAssetDir,
+      noCssModules,
       templatesDir,
       type,
     });

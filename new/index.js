@@ -1,30 +1,39 @@
+const chalk = require('chalk');
 const checkForFilepathReqs = require('./checkForFilepathReqs');
-const error = require('../logging/error');
-const getNounFunction = require('./getNounFunction');
+const getAssetCreationFunction = require('./getAssetCreationFunction');
 const log = require('../logging/log');
 const nameIsValid = require('../functions/nameIsValid');
 
-module.exports = async function _new(noun, name, directory) {
-  const normalizedNoun = normalizeNoun(noun);
-  const type = normalizedNoun.split('-')[0];
-
+module.exports = async function _new({
+  directory,
+  forceCss,
+  forceJavaScript,
+  name,
+  noCssModules,
+  noTests,
+  type,
+})
+{
   log(
     'Creating ' +
-    (normalizedNoun.endsWith('js') ? 'JavaScript' : 'TypeScript') +
+    (type.endsWith('js') ? 'JavaScript' : 'TypeScript') +
     ` ${type} "${chalk.bold(name)}".`
   );
 
   const validState = nameIsValid(name);
   if (validState instanceof Error) {
-    error(validState.message);
-    process.exit(1);
+    throw validState;
   }
 
   await checkForFilepathReqs(directory);
-  await getNounFunction(normalizedNoun)(type, directory, name);
+  await getAssetCreationFunction(type)({
+    directory,
+    forceCss,
+    forceJavaScript,
+    name,
+    noCssModules,
+    noTests,
+  });
 
-  log(
-    (normalizedNoun.endsWith('js') ? 'JavaScript' : 'TypeScript') +
-    ` ${type}, "${chalk.bold(name)}," created.`
-  );
+  log(`${type} "${chalk.bold(name)}", created.`);
 };

@@ -1,26 +1,28 @@
+const makeNewAsset = require('./makeNewAsset');
 const path = require('path');
 
-const makeNewAsset = require('./makeNewAsset');
-
-module.exports = async function makeNewPassage(type, directory, name) {
-  if (!/^passage-[jt]s$/.test(type)) {
-    throw new Error('The type received by makeNewPassage was neither ' +
-                    '"passage-ts" nor "passage-js".');
-  }
-
-  const codeExtension = type === 'passage-js' ? '.jsx' : '.tsx';
-  const destinationDir = path.join(directory, 'passages');
+module.exports = async function makeNewPassage({
+  directory,
+  forceCss,
+  forceJavaScript,
+  name,
+  noCssModules,
+  noTests,
+}) {
+  const type = 'passage';
+  const destinationDir = path.join(directory, `${type}s`);
   const includeStyle = true;
   const templatesDir = path.join(directory, 'templates', type);
 
-  const passage = await makeNewAsset({
-    codeExtension,
+  return await makeNewAsset({
     destinationDir,
+    forceCss,
+    forceJavaScript,
     includeStyle,
     name,
+    noCssModules,
+    noTests,
     templatesDir,
-    type: 'passage',
+    type,
   });
-
-  return passage;
 };
