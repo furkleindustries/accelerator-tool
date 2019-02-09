@@ -1,7 +1,5 @@
-const {
-  IFID,
-} = require('ifid');
 const fs = require('fs-extra');
+const { IFID } = require('ifid');
 const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
 const path = require('path');
 
@@ -21,6 +19,7 @@ module.exports = async function rewriteConfig(directory, name) {
   const modified = makeTemplateReplacements({
     config,
     data,
+    name,
   });
 
   await fs.writeFile(configPath, modified);

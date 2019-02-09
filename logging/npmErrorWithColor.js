@@ -1,6 +1,6 @@
 const chalk = require('chalk');
-const error = require('./error');
-const log = require('./log');
+const error = require('colorful-logging/error');
+const log = require('colorful-logging/log');
 
 module.exports = function npmErrorWithColor(data) {
   const stringified = String(data);
@@ -13,6 +13,6 @@ module.exports = function npmErrorWithColor(data) {
   } else if (stringified.includes('notice')) {
     log(stringified);
   } else {
-    error(stringified, chalk.rgb(155, 155, 155));
+    log(stringified, chalk.rgb(155, 155, 155));
   }
 };

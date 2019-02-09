@@ -1,8 +1,9 @@
 const chalk = require('chalk');
 const checkForFilepathReqs = require('./checkForFilepathReqs');
 const getAssetCreationFunction = require('./getAssetCreationFunction');
-const log = require('../logging/log');
+const log = require('colorful-logging/log');
 const nameIsValid = require('../functions/nameIsValid');
+const path = require('path');
 
 module.exports = async function _new({
   directory,
@@ -22,7 +23,10 @@ module.exports = async function _new({
   }
 
   await checkForFilepathReqs(directory);
+
+  const config = require(path.join(directory, 'accelerator.config'));
   await getAssetCreationFunction(type)({
+    config,
     directory,
     forceCss,
     forceJavaScript,
@@ -31,5 +35,5 @@ module.exports = async function _new({
     noTests,
   });
 
-  log(`${type[0].toUpperCase()}${type.slice(1)} "${chalk.bold(name)}" created.`);
+  log(`Created ${type} "${chalk.bold(name)}".`);
 };

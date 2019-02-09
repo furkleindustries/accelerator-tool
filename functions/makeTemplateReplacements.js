@@ -21,7 +21,10 @@ module.exports = function makeTemplateReplacements({
     delete config.publicUrl;
   }
 
-  let updated = makeReplacement(data, 'name', name);
+  let updated;
+  if (name) {
+    updated = makeReplacement(data, '%name%', name);
+  }
 
   return Object.keys(config).reduce((prev, key) => (
     makeReplacement(

@@ -1,5 +1,5 @@
+const log = require('colorful-logging/log');
 const fs = require('fs-extra');
-const log = require('../logging/log');
 const path = require('path');
 
 module.exports = async function removeOldCore(directory) {

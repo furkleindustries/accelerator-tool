@@ -1,8 +1,7 @@
-const chalk = require('chalk');
 const childProcess = require('child_process');
-const log = require('../logging/log');
-const npmErrorWithColor = require('../logging/npmErrorWithColor');
-const npmLogWithColor = require('../logging/npmLogWithColor');
+const log = require('colorful-logging/log');
+const npmErrorWithColor = require('colorful-logging/npmErrorWithColor');
+const npmLogWithColor = require('colorful-logging/npmLogWithColor');
 
 module.exports = function installProject(directory) {
   log('Installing project dependencies.');

@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const log = require('../logging/log');
+const log = require('colorful-logging/log');
 const path = require('path');
 
 const somethingWentWrongIfYouSawThis =

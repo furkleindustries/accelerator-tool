@@ -1,4 +1,4 @@
-const log = require('../logging/log');
+const log = require('colorful-logging/log');
 const renameCodeWorkspace = require('./renameCodeWorkspace');
 const rewriteConfig = require('./rewriteConfig');
 const rewriteIndexHtml = require('./rewriteIndexHtml');
@@ -12,8 +12,8 @@ module.exports = async function modifyCoreForRedistribution(directory, name) {
 
   await Promise.all([
     renameCodeWorkspace(directory, name),
-    rewriteIndexHtml(directory, config),
-    rewritePackageJson(directory),
+    rewriteIndexHtml(directory, config, name),
+    rewritePackageJson(directory, name),
     rewriteTslint(directory),
   ]);
 

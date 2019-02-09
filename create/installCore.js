@@ -1,5 +1,5 @@
 const childProcess = require('child_process');
-const log = require('../logging/log');
+const log = require('colorful-logging/log');
 const npmErrorWithColor = require('../logging/npmErrorWithColor');
 const npmLogWithColor = require('../logging/npmLogWithColor');
 

@@ -1,5 +1,6 @@
+const chalk = require('chalk');
 const fs = require('fs-extra');
-const log = require('../logging/log');
+const log = require('colorful-logging/log');
 const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
 const path = require('path');
 
@@ -17,9 +18,9 @@ module.exports = async function generateAssetTestFile({
     `${type}.test${codeExtension}`,
   );
 
-  log(`Reading test template from ${testTemplatePath}.`);
+  log(`Reading test template from "${chalk.bold(testTemplatePath)}".`);
 
-  const data = fs.readFile(testTemplatePath);
+  const data = await fs.readFile(testTemplatePath, 'utf8');
 
   log('Rewriting test template.');
 
@@ -31,7 +32,7 @@ module.exports = async function generateAssetTestFile({
 
   const newTestPath = path.join(newAssetDir, `${name}.test${codeExtension}`);
 
-  log(`Writing test template to ${newTestPath}.`);
+  log(`Writing test template to "${chalk.bold(newTestPath)}".`);
 
   await fs.writeFile(newTestPath, rewrittenData);
 };

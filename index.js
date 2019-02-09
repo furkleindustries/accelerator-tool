@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 
-const error = require('./logging/error');
+const error = require('colorful-logging/error');
 
 process.on('unhandledRejection', error => {
-  // Will print "unhandledRejection err is not defined"
-  console.error(require('chalk').red(error.message));
+  console.error(require('chalk').red(error));
   process.exit(1);
 });
 
+const create = require('./create');
 const getDirectory = require('./functions/getDirectory');
 const getNewAssetTypes = require('./functions/getInputNouns');
 const program = require('commander');
 const path = require('path');
+const _new = require('./new');
 
 const package = require('./package.json');
 
@@ -20,11 +21,11 @@ program.version(package.version, '-v, -V, --version');
 program
   .command('create <name> [directory]')
   .description('Create a new Accelerator story.')
-  .action(async (name, directory) =>
+  .action(async (name, dirArg) =>
   {
-    const realDir = getDirectory(directory);
+    const dirPath = path.join(getDirectory(dirArg), name);
     try {
-      await require('./create/')(name, path.join(realDir, name));
+      await create(name, dirPath);
     } catch (err) {
       error(err);
       process.exit(1);
@@ -52,18 +53,17 @@ program
     '--no-tests',
     'Do not generate tests for this asset.',
   )
-  .action(async (type, name, directory, cmd) =>
+  .action(async (type, name, dirArg, cmd) =>
   {
-    const realDir = getDirectory(directory);
     try {
-      await require('./new')({
+      await _new({
         name,
         type,
-        directory: realDir,
+        directory: getDirectory(dirArg),
         forceCss: Boolean(cmd.css),
+        forceJavaScript: Boolean(cmd.javascript),
         noCssModules: Boolean(cmd.noCssModules),
         noTests: Boolean(cmd.noTests),
-        forceJavaScript: !cmd.javascript,
       });
     } catch (err) {
       error(err);
