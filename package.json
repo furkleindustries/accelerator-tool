@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
   "dependencies": {
-    "colorful-logging": "^1.0.1",
+    "colorful-logging": "^1.0.3",
     "commander": "^2.19.0",
     "fs-extra": "^7.0.1",
     "ifid": "^1.1.1",
