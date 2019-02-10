@@ -46,4 +46,4 @@ module.exports = async function rewritePackageJson(directory) {
   });
 
   await fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2));
-}
+};
