@@ -21,7 +21,7 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-const pkg = JSON.parse(fs.readFileSync('./package.json'));
+const pkg = require('./package.json');
 
 program.version(pkg.version, '-v, -V, --version');
 

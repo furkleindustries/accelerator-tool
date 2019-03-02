@@ -1,9 +1,8 @@
 import {
   getInputNouns,
 } from './getInputNouns';
-import {
-  validateNpmPackageName,
-} from 'validate-npm-package-name';
+
+const validateNpmPackageName = require('validate-npm-package-name');
 
 export function nameIsValid(name) {
   if (!name) {
