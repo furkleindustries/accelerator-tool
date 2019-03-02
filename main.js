@@ -8,7 +8,7 @@ import {
   getDirectory,
 } from './functions/getDirectory';
 import {
-  getNewAssetTypes,
+  getInputNouns,
 } from './functions/getInputNouns';
 import program from 'commander';
 import * as path from 'path';
@@ -21,9 +21,9 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-const package = require('./package.json');
+const pkg = JSON.parse(fs.readFileSync('./package.json'));
 
-program.version(package.version, '-v, -V, --version');
+program.version(pkg.version, '-v, -V, --version');
 
 program
   .command('create <name> [directory]')
@@ -42,7 +42,7 @@ program
 program
   .command('new <type> <name> [directory]')
   .description('Create a new asset in an existing Accelerator story. ' +
-               `Available subcommands are: ${getNewAssetTypes().join(', ')}.`)
+               `Available subcommands are: ${getInputNouns().join(', ')}.`)
   .option(
     '-j, --javascript',
     'Generate JavaScript code files instead of TypeScript files for the new ' +

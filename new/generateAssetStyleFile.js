@@ -8,7 +8,7 @@ import {
 } from '../functions/makeTemplateReplacements';
 import * as path from 'path';
 
-module.exports = async function generateAssetStyleFile({
+export async function generateAssetStyleFile({
   config,
   forceCss,
   name,

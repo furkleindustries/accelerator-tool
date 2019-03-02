@@ -17,7 +17,7 @@ import {
   rewriteTslint,
 } from './rewriteTslint';
 
-module.exports = async function modifyCoreForRedistribution(directory, name) {
+export async function modifyCoreForRedistribution(directory, name) {
   log('Modifying core for redistribution.');
 
   const config = await rewriteConfig(directory, name);

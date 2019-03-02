@@ -4,7 +4,7 @@ import {
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-module.exports = async function rewriteTslint(directory) {
+export async function rewriteTslint(directory) {
   log('Rewriting tslint.json.');
 
   const tslintConfigPath = path.join(directory, 'tslint.json');
