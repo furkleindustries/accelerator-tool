@@ -1,11 +1,13 @@
-const fs = require('fs-extra');
-const log = require('colorful-logging/log');
-const path = require('path');
+import{
+  log,
+} from 'colorful-logging/log';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
 const somethingWentWrongIfYouSawThis =
   'If you\'re reading this, something went wrong.';
 
-module.exports = async function writeTempPackageJson(directory) {
+export async function writeTempPackageJson(directory) {
   log('Writing temporary package.json.');
 
   const tempPackageJson = JSON.stringify({
@@ -17,4 +19,4 @@ module.exports = async function writeTempPackageJson(directory) {
   });
 
   await fs.writeFile(path.join(directory, 'package.json'), tempPackageJson);
-};
+}

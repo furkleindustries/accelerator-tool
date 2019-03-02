@@ -1,10 +1,20 @@
-const makeNewFooter = require('./makeNewFooter');
-const makeNewHeader = require('./makeNewHeader');
-const makeNewPassage = require('./makeNewPassage');
-const makeNewPlugin = require('./makeNewPlugin');
-const { assert } = require('ts-assertions');
+import {
+  makeNewFooter,
+} from './makeNewFooter';
+import {
+  makeNewHeader,
+} from './makeNewHeader';
+import {
+  makeNewPassage,
+} from './makeNewPassage';
+import {
+  makeNewPlugin,
+} from './makeNewPlugin';
+import {
+  assert,
+} from 'ts-assertions';
 
-module.exports = function getAssetCreationFunction(type) {
+export function getAssetCreationFunction(type) {
   let func;
   if (/^passage$/.test(type)) {
     func = makeNewPassage;
@@ -22,4 +32,4 @@ module.exports = function getAssetCreationFunction(type) {
   );
 
   return func;
-};
+}

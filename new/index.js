@@ -1,11 +1,19 @@
-const chalk = require('chalk');
-const checkForFilepathReqs = require('./checkForFilepathReqs');
-const getAssetCreationFunction = require('./getAssetCreationFunction');
-const log = require('colorful-logging/log');
-const nameIsValid = require('../functions/nameIsValid');
-const path = require('path');
+import chalk from 'chalk';
+import {
+  checkForFilepathReqs,
+} from './checkForFilepathReqs';
+import {
+  log,
+} from 'colorful-logging/log';
+import {
+  getAssetCreationFunction,
+} from './getAssetCreationFunction';
+import {
+  nameIsValid,
+} from '../functions/nameIsValid';
+import * as path from 'path';
 
-module.exports = async function _new({
+export async function newAsset({
   directory,
   forceCss,
   forceJavaScript,
@@ -36,4 +44,4 @@ module.exports = async function _new({
   });
 
   log(`Created ${type} "${chalk.bold(name)}".`);
-};
+}

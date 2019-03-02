@@ -1,10 +1,12 @@
-const log = require('colorful-logging/log');
-const fs = require('fs-extra');
-const path = require('path');
+import {
+  log,
+} from 'colorful-logging/log';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
 module.exports = async function rewriteTslint(directory) {
   log('Rewriting tslint.json.');
-  
+
   const tslintConfigPath = path.join(directory, 'tslint.json');
 
   const data = await fs.readFile(tslintConfigPath, 'utf8');
@@ -19,4 +21,4 @@ module.exports = async function rewriteTslint(directory) {
   /* Do not lint source files in redists. */
   lintConfig.linterOptions.exclude.push('src/');
   await fs.writeFile(tslintConfigPath, JSON.stringify(lintConfig, null, 2));
-};
+}

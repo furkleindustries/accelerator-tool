@@ -1,9 +1,21 @@
-const log = require('colorful-logging/log');
-const renameCodeWorkspace = require('./renameCodeWorkspace');
-const rewriteConfig = require('./rewriteConfig');
-const rewriteIndexHtml = require('./rewriteIndexHtml');
-const rewritePackageJson = require('./rewritePackageJson');
-const rewriteTslint = require('./rewriteTslint');
+import {
+  log,
+} from 'colorful-logging';
+import {
+  renameCodeWorkspace,
+} from './renameCodeWorkspace';
+import {
+  rewriteConfig,
+} from './rewriteConfig';
+import {
+  rewriteIndexHtml,
+} from './rewriteIndexHtml';
+import {
+  rewritePackageJson,
+} from './rewritePackageJson';
+import {
+  rewriteTslint,
+} from './rewriteTslint';
 
 module.exports = async function modifyCoreForRedistribution(directory, name) {
   log('Modifying core for redistribution.');
@@ -18,4 +30,4 @@ module.exports = async function modifyCoreForRedistribution(directory, name) {
   ]);
 
   log('Finished modifying core.');
-};
+}

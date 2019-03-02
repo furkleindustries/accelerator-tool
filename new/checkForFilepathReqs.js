@@ -1,10 +1,14 @@
-const chalk = require('chalk');
-const fs = require('fs-extra');
-const log = require('colorful-logging/log');
-const path = require('path');
-const { assert } = require('ts-assertions');
+import chalk from 'chalk';
+import {
+  log,
+} from 'colorful-logging';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import {
+  assert,
+} from 'ts-assertions';
 
-module.exports = async function checkForFilepathReqs(directory) {
+export async function checkForFilepathReqs(directory) {
   log('Checking filepath requirements.');
 
   const dirExists = await fs.exists(directory);
@@ -22,4 +26,4 @@ module.exports = async function checkForFilepathReqs(directory) {
     configExists,
     `There was no ${confStr} file within "${chalk.bold(directory)}".`,
   );
-};
+}

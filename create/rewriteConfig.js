@@ -1,9 +1,13 @@
-const fs = require('fs-extra');
-const { IFID } = require('ifid');
-const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
-const path = require('path');
+import * as fs  from 'fs-extra';
+import {
+  IFID,
+} from 'ifid';
+import {
+  makeTemplateReplacements,
+} from '../functions/makeTemplateReplacements';
+import * as path from 'path';
 
-module.exports = async function rewriteConfig(directory, name) {
+export async function rewriteConfig(directory, name) {
   const defPath = path.join(directory, 'src', 'configuration', 'defaults');
   const { defaults } = require(defPath);
   const ifid = new IFID().toString();
@@ -24,5 +28,5 @@ module.exports = async function rewriteConfig(directory, name) {
 
   await fs.writeFile(configPath, modified);
 
-  return require(path.join(directory, 'accelerator.config'));
+  return import(path.join(directory, 'accelerator.config'));
 }

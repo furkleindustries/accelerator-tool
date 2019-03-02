@@ -1,8 +1,8 @@
-module.exports = function getInputNouns() {
+export function getInputNouns() {
   return [
     'passage',
     'header',
     'footer',
     'plugin',
   ];
-};
+}

@@ -1,10 +1,14 @@
-const chalk = require('chalk');
-const fs = require('fs-extra');
-const log = require('colorful-logging/log');
-const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
-const path = require('path');
+import chalk from 'chalk';
+import {
+  log,
+} from 'colorful-logging/log';
+import * as fs from 'fs-extra';
+import {
+  makeTemplateReplacements,
+} from '../functions/makeTemplateReplacements';
+import * as path from 'path';
 
-module.exports = async function generateAssetTestFile({
+export async function generateAssetTestFile({
   codeExtension,
   config,
   name,
@@ -35,4 +39,4 @@ module.exports = async function generateAssetTestFile({
   log(`Writing test template to "${chalk.bold(newTestPath)}".`);
 
   await fs.writeFile(newTestPath, rewrittenData);
-};
+}

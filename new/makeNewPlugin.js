@@ -1,7 +1,9 @@
-const makeNewAsset = require('./makeNewAsset');
-const path = require('path');
+import {
+  makeNewAsset,
+} from './makeNewAsset';
+import * as path from 'path';
 
-module.exports = async function makeNewPlugin({
+export async function makeNewPlugin({
   config,
   directory,
   forceJavaScript,
@@ -27,4 +29,4 @@ module.exports = async function makeNewPlugin({
     templatesDir,
     type,
   });
-};
+}

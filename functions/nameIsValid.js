@@ -1,7 +1,11 @@
-const getInputNouns = require('./getInputNouns');
-const validateNpmPackageName = require('validate-npm-package-name');
+import {
+  getInputNouns,
+} from './getInputNouns';
+import {
+  validateNpmPackageName,
+} from 'validate-npm-package-name';
 
-module.exports = function nameIsValid(name) {
+export function nameIsValid(name) {
   if (!name) {
     return new Error('No name was provided.');
   } else if (typeof name !== 'string') {
@@ -25,4 +29,4 @@ module.exports = function nameIsValid(name) {
   }
 
   return true;
-};
+}

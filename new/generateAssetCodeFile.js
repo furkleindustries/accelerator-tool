@@ -1,10 +1,14 @@
-const chalk = require('chalk');
-const log = require('colorful-logging/log');
-const fs = require('fs-extra');
-const makeTemplateReplacements = require('../functions/makeTemplateReplacements');
-const path = require('path');
+import chalk from 'chalk';
+import {
+  log,
+} from 'colorful-logging';
+import * as fs from 'fs-extra';
+import {
+  makeTemplateReplacements,
+} from '../functions/makeTemplateReplacements';
+import * as path from 'path';
 
-module.exports = async function generateAssetCodeFile({
+export async function generateAssetCodeFile({
   codeExtension,
   config,
   name,
@@ -32,4 +36,4 @@ module.exports = async function generateAssetCodeFile({
   log(`Writing code template to "${chalk.bold(newCodePath)}".`);
 
   await fs.writeFile(newCodePath, rewrittenData);
-};
+}

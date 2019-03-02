@@ -1,8 +1,10 @@
-const log = require('colorful-logging/log');
-const fs = require('fs-extra');
-const path = require('path');
+import {
+  log,
+} from 'colorful-logging/log';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
-module.exports = async function moveCore(directory) {
+export async function moveCore(directory) {
   log('Moving core contents to story folder.');
 
   const coreDir = path.join(directory, 'node_modules', 'accelerator-core');
@@ -12,4 +14,4 @@ module.exports = async function moveCore(directory) {
   };
 
   await fs.copy(coreDir, directory, copyArgs);
-};
+}

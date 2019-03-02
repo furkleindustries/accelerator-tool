@@ -1,8 +1,10 @@
-const fs = require('fs-extra');
-const log = require('colorful-logging/log');
-const path = require('path');
+import * as fs from 'fs-extra';
+import {
+  log,
+} from 'colorful-logging';
+import * as path from 'path';
 
-module.exports = async function rewritePackageJson(directory) {
+export async function rewritePackageJson(directory) {
   log('Rewriting package.json.');
 
   const packagePath = path.join(directory, 'package.json');
@@ -46,4 +48,4 @@ module.exports = async function rewritePackageJson(directory) {
   });
 
   await fs.writeFile(packagePath, JSON.stringify(corePackage, null, 2));
-};
+}

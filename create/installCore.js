@@ -1,9 +1,17 @@
-const childProcess = require('child_process');
-const log = require('colorful-logging/log');
-const npmErrorWithColor = require('../logging/npmErrorWithColor');
-const npmLogWithColor = require('../logging/npmLogWithColor');
+import {
+  spawn,
+} from 'child_process';
+import {
+  log,
+} from 'colorful-logging';
+import {
+  npmErrorWithColor,
+} from '../logging/npmErrorWithColor';
+import {
+  npmLogWithColor,
+} from '../logging/npmLogWithColor';
 
-module.exports = function installCore(directory) {
+export function installCore(directory) {
   log('Installing accelerator-core.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -13,7 +21,7 @@ module.exports = function installCore(directory) {
   ];
 
   const spawnArgs = { cwd: directory };
-  const child = childProcess.spawn(cmd, args, spawnArgs);
+  const child = spawn(cmd, args, spawnArgs);
   child.stdout.on('data', npmLogWithColor);
   child.stderr.on('data', npmErrorWithColor);
 

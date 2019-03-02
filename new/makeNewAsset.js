@@ -1,12 +1,20 @@
-const chalk = require('chalk');
-const log = require('colorful-logging/log');
-const fs = require('fs-extra');
-const generateAssetCodeFile = require('./generateAssetCodeFile');
-const generateAssetStyleFile = require('./generateAssetStyleFile');
-const generateAssetTestFile = require('./generateAssetTestFile');
-const path = require('path');
+import chalk from 'chalk';
+import {
+  log,
+} from 'colorful-logging/log';
+import * as fs from 'fs-extra';
+import {
+  generateAssetCodeFile,
+} from './generateAssetCodeFile';
+import {
+  generateAssetStyleFile,
+} from './generateAssetStyleFile';
+import {
+  generateAssetTestFile,
+} from './generateAssetTestFile';
+import * as path from 'path';
 
-module.exports = async function makeNewAsset({
+export async function makeNewAsset({
   config,
   destinationDir,
   forceCss,
@@ -69,4 +77,4 @@ module.exports = async function makeNewAsset({
   }
 
   await Promise.all(promises);
-};
+}

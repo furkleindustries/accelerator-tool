@@ -1,6 +1,6 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 const log = require('colorful-logging/log');
 
-module.exports = function npmLogWithColor(data) {
+export function npmLogWithColor(data) {
   log(data, chalk.rgb(155, 155, 155));
-};
+}

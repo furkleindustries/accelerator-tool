@@ -1,18 +1,23 @@
-const chalk = require('chalk');
-const error = require('colorful-logging/error');
-const log = require('colorful-logging/log');
+import {
+  error,
+  log,
+  warn,
+} from 'colorful-logging';
+import {
+  npmLogWithColor,
+} from './npmLogWithColor';
 
-module.exports = function npmErrorWithColor(data) {
+export function npmErrorWithColor(data) {
   const stringified = String(data);
   if (stringified.includes('ERR!')) {
-    error(stringified, chalk.red);
+    error(stringified);
   } else if (/^npm WARN../.test(stringified) &&
              !stringified.includes('SKIPPING OPTIONAL DEPENDENCY'))
   {
-    error(stringified, chalk.yellow);
+    warn(stringified);
   } else if (stringified.includes('notice')) {
     log(stringified);
   } else {
-    log(stringified, chalk.rgb(155, 155, 155));
+    npmLogWithColor(stringified);
   }
-};
+}

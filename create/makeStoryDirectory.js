@@ -1,6 +1,6 @@
-const fs = require('fs-extra');
+import * as fs from 'fs-extra';
 
-module.exports = async function makeStoryDirectory(directory) {
+export async function makeStoryDirectory(directory) {
   try {
     await fs.mkdir(directory);
   } catch (err) {
@@ -10,4 +10,4 @@ module.exports = async function makeStoryDirectory(directory) {
       throw err;
     }
   }
-};
+}

@@ -1,4 +1,4 @@
-module.exports = function getNounNormalizationTable() {
+export function getNounNormalizationTable() {
   return {
     'passage': 'passage-ts',
     'passage-ts': 'passage-ts',
@@ -24,4 +24,4 @@ module.exports = function getNounNormalizationTable() {
     'plugin-js': 'plugin-js',
     'plugin-jsx': 'plugin-js',
   };
-};
+}

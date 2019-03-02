@@ -1,9 +1,11 @@
-const makeReplacement = require('./makeReplacement');
-const {
+import {
+  makeReplacement,
+} from './makeReplacement';
+import {
   assert,
-} = require('ts-assertions');
+} from 'ts-assertions';
 
-module.exports = function makeTemplateReplacements({
+export function makeTemplateReplacements({
   config,
   data,
   dontReplacePublicUrl,
@@ -26,11 +28,9 @@ module.exports = function makeTemplateReplacements({
     updated = makeReplacement(data, '%name%', name);
   }
 
-  return Object.keys(config).reduce((prev, key) => (
-    makeReplacement(
-      prev,
-      `%${key}%`,
-      config[key],
-    )
+  return Object.keys(config).reduce((prev, key) => makeReplacement(
+    prev,
+    `%${key}%`,
+    config[key],
   ), updated);
-};
+}

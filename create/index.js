@@ -1,15 +1,33 @@
-const chalk = require('chalk');
-const log = require('colorful-logging/log');
-const installCore = require('./installCore');
-const installProject = require('./installProject');
-const makeStoryDirectory = require('./makeStoryDirectory');
-const modifyCoreForRedistribution = require('./modifyCoreForRedistribution');
-const moveCore = require('./moveCore');
-const nameIsValid = require('../functions/nameIsValid');
-const removeOldCore = require('./removeOldCore');
-const writeTempPackageJson = require('./writeTempPackageJson');
+import chalk from 'chalk';
+import {
+  log,
+} from 'colorful-logging';
+import {
+  installCore,
+} from './installCore';
+import {
+  installProject,
+} from './installProject';
+import {
+  makeStoryDirectory,
+} from './makeStoryDirectory';
+import {
+  modifyCoreForRedistribution,
+} from './modifyCoreForRedistribution';
+import {
+  moveCore,
+} from './moveCore';
+import {
+  nameIsValid,
+} from '../functions/nameIsValid';
+import {
+  removeOldCore,
+} from './removeOldCore';
+import {
+  writeTempPackageJson,
+} from './writeTempPackageJson';
 
-module.exports = async function create(name, directory) {
+export async function create(name, directory) {
   log(
     `Creating story "${chalk.bold(name)}" at "${chalk.bold(directory)}".`,
   );
@@ -23,8 +41,11 @@ module.exports = async function create(name, directory) {
   await writeTempPackageJson(directory);
   await installCore(directory);
   await moveCore(directory);
-  await removeOldCore(directory);
-  await modifyCoreForRedistribution(directory, name);
+  await Promise.all([
+    removeOldCore(directory),
+    modifyCoreForRedistribution(directory, name),
+  ]);
+
   await installProject(directory);
 
   log(
@@ -35,4 +56,4 @@ module.exports = async function create(name, directory) {
   log('Happy developing! Accelerator is made with ' +
       `${chalk.red('❤')}️ (love) by Furkle Industries. Remember: fiction ` +
       'can and should make the world a better place.');
-};
+}

@@ -1,9 +1,17 @@
-const childProcess = require('child_process');
-const log = require('colorful-logging/log');
-const npmErrorWithColor = require('../logging/npmErrorWithColor');
-const npmLogWithColor = require('../logging/npmLogWithColor');
+import {
+  spawn,
+} from 'child_process';
+import {
+  log,
+} from 'colorful-logging';
+import {
+  npmErrorWithColor,
+} from '../logging/npmErrorWithColor';
+import {
+  npmLogWithColor,
+} from '../logging/npmLogWithColor';
 
-module.exports = function installProject(directory) {
+export function installProject(directory) {
   log('Installing project dependencies.');
 
   const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -23,4 +31,4 @@ module.exports = function installProject(directory) {
       return resolve();
     });
   });
-};
+}

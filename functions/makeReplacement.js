@@ -1,8 +1,8 @@
-const {
+import {
   assert,
-} = require('ts-assertions');
+} from 'ts-assertions';
 
-const strings = {
+export const strings = {
   DATA_INVALID:
     'The data argument provided to the makeReplacement function is not a ' +
     'string with content.',
@@ -16,17 +16,17 @@ const strings = {
     'non-null and non-undefined value.',
 };
 
-module.exports = function makeReplacement(data, key, value) {
+export function makeReplacement(data, key, value) {
   assert(data && typeof data === 'string', strings.DATA_INVALID);
   assert(key && typeof key === 'string', strings.KEY_INVALID);
-  assert(typeof value !== 'undefined' && value !== null, strings.VALUE_INVALID);
+  assert(
+    typeof value !== 'undefined' && value !== null,
+    strings.VALUE_INVALID,
+  );
 
   const valueStr = typeof value === 'object' ?
     JSON.stringify(value, null, 2) :
     value;
- 
+
   return data.split(key).join(valueStr);
-};
-
-
-module.exports.strings = strings;
+}

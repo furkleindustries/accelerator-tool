@@ -1,4 +1,4 @@
-module.exports = function getDirectory(directory) {
+export function getDirectory(directory) {
   if (directory) {
     return directory;
   }
