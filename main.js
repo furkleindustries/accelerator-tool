@@ -1,3 +1,6 @@
+/* Ensure that promises which reject and are not caught cause errors. */
+import './catchUnhandledRejections';
+
 import {
   error,
 } from 'colorful-logging';
@@ -15,11 +18,6 @@ import * as path from 'path';
 import {
   newAsset,
 } from './new';
-
-process.on('unhandledRejection', (err) => {
-  error(err);
-  process.exit(1);
-});
 
 const pkg = require('./package.json');
 

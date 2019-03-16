@@ -17,10 +17,10 @@ import {
   rewriteTslint,
 } from './rewriteTslint';
 
-export async function modifyCoreForRedistribution(directory, name) {
+export async function modifyCoreForRedistribution(directory, name, coreVersion) {
   log('Modifying core for redistribution.');
 
-  const config = await rewriteConfig(directory, name);
+  const config = await rewriteConfig(directory, name, coreVersion);
 
   await Promise.all([
     renameCodeWorkspace(directory, name),

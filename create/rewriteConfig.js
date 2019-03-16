@@ -7,14 +7,19 @@ import {
 } from '../functions/makeTemplateReplacements';
 import * as path from 'path';
 
-export async function rewriteConfig(directory, name) {
+export async function rewriteConfig(directory, name, coreVersion) {
+  const toolPackageJson = require(path.join(__filename, '..', 'package.json'));
+  const toolVersion = toolPackageJson.version;
+
   const defPath = path.join(directory, 'src', 'configuration', 'defaults');
   const { defaults } = require(defPath);
   const ifid = new IFID().toString();
   const config = {
     ...defaults,
+    coreVersion,
     ifid,
     name,
+    toolVersion,
   };
 
   const configPath = path.join(directory, 'accelerator.config.js');

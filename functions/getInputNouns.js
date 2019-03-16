@@ -3,6 +3,7 @@ export function getInputNouns() {
     'passage',
     'header',
     'footer',
+    'option',
     'plugin',
   ];
 }

@@ -20,6 +20,7 @@ import {
 import {
   nameIsValid,
 } from '../functions/nameIsValid';
+import * as path from 'path';
 import {
   removeOldCore,
 } from './removeOldCore';
@@ -41,9 +42,10 @@ export async function create(name, directory) {
   await writeTempPackageJson(directory);
   await installCore(directory);
   await moveCore(directory);
+  const coreVersion = require(path.join(directory, 'package.json')).version;
   await Promise.all([
     removeOldCore(directory),
-    modifyCoreForRedistribution(directory, name),
+    modifyCoreForRedistribution(directory, name, coreVersion),
   ]);
 
   await installProject(directory);
@@ -55,5 +57,5 @@ export async function create(name, directory) {
 
   log('Happy developing! Accelerator is made with ' +
       `${chalk.red('❤')}️ (love) by Furkle Industries. Remember: fiction ` +
-      'can and should make the world a better place.');
+      'can and should make the world a better place!');
 }

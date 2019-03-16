@@ -1,6 +1,6 @@
 import {
-  makeReplacement,
-} from './makeReplacement';
+  compile,
+} from 'handlebars';
 import {
   assert,
 } from 'ts-assertions';
@@ -17,20 +17,11 @@ export function makeTemplateReplacements({
     'The config argument was not provided to makeTemplateReplacements.',
   );
 
-  delete config.name;
+  const handlebarsContext = {
+    ...config,
+    name: name || config.name,
+    publicUrl: dontReplacePublicUrl ? undefined : config.publicUrl,
+  };
 
-  if (dontReplacePublicUrl) {
-    delete config.publicUrl;
-  }
-
-  let updated;
-  if (name) {
-    updated = makeReplacement(data, '%name%', name);
-  }
-
-  return Object.keys(config).reduce((prev, key) => makeReplacement(
-    prev,
-    `%${key}%`,
-    config[key],
-  ), updated);
+  return compile(data)(handlebarsContext);
 }
