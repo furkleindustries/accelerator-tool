@@ -1,6 +1,6 @@
 {
   "name": "accelerator-tool",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new assets within them.",
   "main": "index.js",
   "bin": "./index.js",
@@ -24,15 +24,7 @@
   },
   "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
   "dependencies": {
-    "chalk": "^2.4.2",
-    "colorful-logging": "^1.2.0",
-    "commander": "^2.19.0",
-    "esm": "^3.2.7",
-    "fs-extra": "^7.0.1",
-    "handlebars": "^4.1.0",
-    "ifid": "^1.1.1",
-    "ts-assertions": "^1.0.11",
-    "validate-npm-package-name": "^3.0.0"
+    "accelerator-tool-cli": "^0.1.0"
   },
   "devDependencies": {
     "jest": "^24.1.0"
