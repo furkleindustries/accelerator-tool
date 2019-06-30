@@ -1,4 +1,4 @@
 process.on('unhandledRejection', (err) => {
-  error(err);
+  console.error(err);
   process.exit(1);
 });
