@@ -1,6 +1,6 @@
 {
   "name": "accelerator-tool",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new assets within them.",
   "main": "index.js",
   "bin": "./index.js",
@@ -25,5 +25,8 @@
   "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
   "devDependencies": {
     "jest": "^24.1.0"
+  },
+  "dependencies": {
+    "esm": "^3.2.25"
   }
 }
