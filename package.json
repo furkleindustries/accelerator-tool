@@ -1,6 +1,6 @@
 {
   "name": "accelerator-tool",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new assets within them.",
   "main": "index.js",
   "bin": "./index.js",
@@ -27,6 +27,7 @@
     "jest": "^24.1.0"
   },
   "dependencies": {
+    "colorful-logging": "^1.2.4",
     "esm": "^3.2.25"
   }
 }
