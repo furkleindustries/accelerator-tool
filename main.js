@@ -1,32 +1,83 @@
 /* Ensure that promises which reject and are not caught cause errors. */
-require('./catchUnhandledRejections');
+import './catchUnhandledRejections';
 
-const fallBackToLocalInstall = require('./fallBackToLocalInstall');
+import {
+  error,
+} from 'colorful-logging';
+import program from 'commander';
+import {
+  create,
+} from './src/create';
+import {
+  getDirectory,
+} from './src/functions/getDirectory';
+import {
+  getInputNouns,
+} from './src/functions/getInputNouns';
+import * as path from 'path';
+import {
+  newAsset,
+} from './src/new';
 
-const cwd = process.cwd();
+const pkg = require('./package.json');
 
-try {
-  const cliPath = require.resolve(
-    'accelerator-tool-cli',
-    { paths: [ cwd ] },
-  );
+program.version(pkg.version, '-v, -V, --version');
 
-  require(cliPath);
-} catch (err) {
-  fallBackToLocalInstall().then(
-    () => {
-      const cliPath = require.resolve(
-        'accelerator-tool-cli',
-        { paths: [ cwd ] },
-      );
+program
+  .command('create <name> [directory]')
+  .description('Create a new Accelerator story.')
+  .action(async (name, dirArg) =>
+  {
+    const dirPath = path.join(getDirectory(dirArg), name);
+    try {
+      await create(name, dirPath);
+    } catch (err) {
+      error(err);
+      process.exit(1);
+    }
+  });
 
-      require(cliPath);
-    },
+program
+  .command('new <type> <name> [directory]')
+  .description('Create a new asset in an existing Accelerator story. ' +
+               `Available subcommands are: ${getInputNouns().join(', ')}.`)
+  .option(
+    '-j, --javascript',
+    'Generate JavaScript code files instead of TypeScript files for the new ' +
+      'asset.',
+  ).option(
+    '-c, --css',
+    'Generate CSS style files instead of Sass files.',
+  ).option(
+    '--no-css-modules',
+    'Do not use CSS Modules with the generated style files.',
+  ).option(
+    '--no-tests',
+    'Do not generate tests for this asset.',
+  ).action(async (type, name, dirArg, cmd) =>
+  {
+    try {
+      await newAsset({
+        name,
+        type,
+        directory: getDirectory(dirArg),
+        forceCss: Boolean(cmd.css),
+        forceJavaScript: Boolean(cmd.javascript),
+        noCssModules: Boolean(cmd.noCssModules),
+        noTests: Boolean(cmd.noTests),
+      });
+    } catch (err) {
+      error(err);
+      process.exit(1);
+    }
+  });
 
-    (errTwo) => {
-      throw new Error(errTwo);
-    },
-  )
+program
+  .option('-h')
+  .action(program.outputHelp)
+
+program.parse(process.argv);
+
+if (!program.args.length) {
+  program.outputHelp();
 }
-
-module.exports = {};

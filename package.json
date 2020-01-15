@@ -1,33 +1,40 @@
 {
-  "name": "accelerator-tool",
-  "version": "0.8.4",
-  "description": "The devtool for the Accelerator story framework, allowing quick creation of new projects, and new assets within them.",
+  "name": "accelerator-tool-cli",
+  "version": "0.4.0",
+  "description": "The Accelerator devtool. Generally invoked with accelerator-tool, npx accelerator-tool, or xlr8r.",
+  "author": "furkle",
+  "license": "GPL-3.0",
   "main": "index.js",
-  "bin": "./index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/furkleindustries/accelerator-tool.git"
-  },
   "keywords": [
     "accelerator",
     "if",
     "hypertext",
     "fiction"
   ],
-  "author": "furkle",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/furkleindustries/accelerator-tool/issues"
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "colorful-logging": "^1.2.2",
+    "commander": "^2.19.0",
+    "esm": "^3.2.7",
+    "fs-extra": "^7.0.1",
+    "handlebars": "^4.7.2",
+    "hasbin": "^1.2.3",
+    "ifid": "^1.1.1",
+    "ts-assertions": "^1.0.11",
+    "validate-npm-package-name": "^3.0.0"
   },
-  "homepage": "https://github.com/furkleindustries/accelerator-tool#readme",
   "devDependencies": {
     "jest": "^24.1.0"
   },
-  "dependencies": {
-    "colorful-logging": "^1.2.4",
-    "esm": "^3.2.25"
+  "scripts": {
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/furkleindustries/accelerator-tool-cli/issues"
+  },
+  "homepage": "https://github.com/furkleindustries/accelerator-tool-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/furkleindustries/accelerator-tool-cli.git"
   }
 }
